@@ -1,0 +1,35 @@
+	default Double calculateGafromUvf(Double[] crlArr, Double[] hcArr, Double[] flArr) {
+		
+		Double crl  = crlArr[1] != null ? getMedian(crlArr) : crlArr[0];
+		Double hc  = hcArr[1] != null ? getMedian(hcArr) : null;
+		Double fl  = flArr[1] != null ? getMedian(flArr) : null;
+		
+		Double ga = null;
+		
+		//GA = 40.9041 + (3.21585 × CRL^0.5) + (0.348956 × CRL)
+		if(crl != null && crl >= 1.50 && crl < 9.50) {
+			crl = crl * 10;
+			double gaD = 40.9041 + (3.21585 * Math.pow(crl,0.5)) + (0.348956 * crl);
+			ga =  (gaD/7);
+		}else if(crl != null && crl >= 9.50){
+			
+			// log¬e(GA) = 0.03243 × (loge (HC))^2 + 0.001644 × FL × loge (HC) + 3.813. 
+			if(hc != null && fl != null) {
+				hc = hc*10;
+				fl = fl*10;
+				
+				double logHc = Math.log(hc);
+				double logGa = 0.03243 * Math.pow(logHc,2) + 0.001644 * fl * logHc + 3.813;
+				double logBasee = Math.pow(2.718281828,logGa);
+				
+				ga = (logBasee/7);
+			}
+		}
+		
+		if(ga != null) {
+			ga = Double.parseDouble(decfor.format(ga));
+		}
+		
+		return ga;
+		
+	}

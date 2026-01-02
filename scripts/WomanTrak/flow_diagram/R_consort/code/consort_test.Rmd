@@ -1,0 +1,52 @@
+---
+title: "<center>MiNDR PW Trial Consort</center>"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r consort-plot, echo=FALSE,warning=FALSE,message=FALSE,error=FALSE,fig.width=14, fig.height=12}
+
+
+# Your consort plot code here
+
+rm(list=ls())
+
+setwd("C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MiNDR/data/scripts/WomanTrak/flow_diagram/R_consort/code")
+library(tidyr)
+library(dplyr)
+library(tidyverse)
+library(readxl)
+# library(REDCapR)
+library(consortr)
+library(haven)
+library(patchwork)
+library(consort)
+library(tinytex)
+
+# install_tinytex()
+# install.packages("htmlwidgets")
+install.packages("tinytex")
+# library(htmlwidgets)
+
+data(dispos.data)
+df <- dispos.data[!dispos.data$arm3 %in% "Trt C", ]
+p <- consort_plot(data = df,
+                  orders = list(c(trialno = "Population"),
+                                c(exclusion = "Excluded"),
+                                c(arm     = "Randomized patient"),
+                                c(arm3     = "", 
+                                  subjid_notdosed="Participants not treated"),
+                                c(followup    = "Pariticpants planned for follow-up",
+                                  lost_followup = "Reason for tot followed"),
+                                c(assessed = "Assessed for final outcome"),
+                                c(no_value = "Reason for not assessed"),
+                                c(mitt = "Included in the mITT analysis")),
+                  side_box = c("exclusion", "no_value"),
+                  allocation = c("arm", "arm3"),
+                  labels = c("1" = "Screening", "2" = "Randomization",
+                             "5" = "Follow-up", "7" = "Final analysis"),
+                  cex = 0.7)
+
+# Plot the consort diagram
+plot(p)

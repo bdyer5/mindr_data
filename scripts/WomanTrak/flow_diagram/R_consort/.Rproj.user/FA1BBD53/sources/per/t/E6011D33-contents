@@ -1,0 +1,258 @@
+---
+title: "MiNDR PW Trial Consort"
+output: pdf_document
+  # : default
+  # html_document: default
+---
+
+```{r setup, echo=FALSE,warning=FALSE,message=FALSE,error=FALSE,fig.width=30, fig.height=25}
+knitr::opts_chunk$set(echo = FALSE)
+
+# Your consort plot code here
+
+rm(list=ls())
+
+setwd("C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MiNDR/data/scripts/WomanTrak/flow_diagram/R_consort/code")
+library(tidyr)
+library(dplyr)
+# library(tidyverse)
+# library(readxl)
+# library(REDCapR)
+library(consortr)
+library(haven)
+# library(patchwork)
+library(consort)
+# library(tinytex)
+
+# install_tinytex()
+# install.packages("htmlwidgets")
+# install.packages("tinytex")
+# library(htmlwidgets)
+
+
+
+df <- read_dta("C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MiNDR/data/datasets/20241130_20241212/stata/PW_study/pregtrak.dta")
+ 
+ # women eligible for pregnancy surveilance 
+wtrak_pw <- df 
+
+wtrak_pw_p <- wtrak_pw
+wtrak_pw_p$mpf_status <- as.numeric(wtrak_pw_p$mpf_status)
+wtrak_pw_p$mpfb_status <- as.numeric(wtrak_pw_p$mpfb_status)
+wtrak_pw_p$lpf_status <- as.numeric(wtrak_pw_p$lpf_status)
+wtrak_pw_p$lpfb_status <- as.numeric(wtrak_pw_p$lpfb_status)
+wtrak_pw_p$outc <- as.numeric(wtrak_pw_p$outc)
+
+# wtrak_pw_p %>% count(mpfb_status)
+# wtrak_pw_p %>% count(lpfb_status)
+# wtrak_pw_p %>% count(lpf_status)
+# wtrak_pw_p %>% count(outc)
+
+
+# # pregnancies detected 
+# preg_pw <- wtrak_pw %>% 
+#   filter(psfurt==1 )
+# 
+# preg_pw_consent <- preg_pw %>% 
+#   filter(consent==1)
+# 
+# preg_pw_consent_w <- preg_pw_consent %>% 
+#   filter(arm_pw=="W")
+# preg_pw_consent_x <- preg_pw_consent %>% 
+#   filter(arm_pw=="X")
+# preg_pw_consent_y <- preg_pw_consent %>% 
+#   filter(arm_pw=="Y")
+# preg_pw_consent_z <- preg_pw_consent %>% 
+#   filter(arm_pw=="Z")
+# 
+# 
+# wtrak_pw %>% count(consent)
+wtrak_pw_prepped <- wtrak_pw_p %>% 
+  mutate(pregnant=case_when(psfurt==1 ~"pregnant",
+                            TRUE ~as.character(NA))
+         ,consented=case_when(pef_consent==1 ~"consented",
+                              TRUE ~as.character(NA)),
+         
+         # pregnancies_not=case_when(psfurt!=1 ),
+         pef_status_desc=case_when(
+           is.na(pef_status) & pef_eligible==0 ~"PEF - ineligible",
+           is.na(pef_status) & pef_eligible==1  ~"PEF - pending interview",
+           pef_status==1  & pef_eligible==1 & pef_consent==1  ~"PEF - met - consented",
+           pef_status==1  & pef_eligible==1 & pef_consent==6  ~"PEF - met - refused consented",
+           pef_status==1  & pef_eligible==1 & pef_consent==3  ~"PEF - met - pending consent",
+           pef_status==1  & pef_eligible==1  ~"pef - met",
+           pef_status==2  & pef_eligible==1  ~"Not met (up to 17 weeks post-LMP)",
+           pef_status==3  & pef_eligible==1  ~"Woman had Menstrual Regulation",
+           pef_status==4  & pef_eligible==1  ~"Woman had Miscarriage",
+           pef_status==6  & pef_eligible==1  ~"Woman refused PEF",
+           pef_status==7  & pef_eligible==1  ~"Woman permanently moved",
+           pef_status==8  & pef_eligible==1  ~"Woman Died' end as pef_status_desc"
+         )) %>% 
+  mutate(pef_not_consented=case_when(pef_status_desc=="PEF - met - consented" ~as.character(NA),
+                                     TRUE ~as.character(pef_status_desc)),
+         consented2=consented,
+         arm_pw=case_when(arm_pw==""  ~as.character(NA),
+                          is.na(consented) ~as.character(NA),
+                          TRUE ~as.character(arm_pw)),
+         
+         saf_flow_status_desc=case_when(pef_consent==1 & saf_flow_status ==1 ~"SAF - Met",
+                                        pef_consent==1 & saf_flow_status ==2 ~"SAF - Not Met",
+                                        pef_consent==1 & saf_flow_status ==3 ~"SAF - Met over phone",
+                                        pef_consent==1 & saf_flow_status ==4 ~"SAF - Miscarriage",
+                                        pef_consent==1 & saf_flow_status ==5 ~"SAF - Menstrual Regulation ",
+                                        pef_consent==1 & saf_flow_status ==6 ~"SAF - Live Birth",
+                                        pef_consent==1 & saf_flow_status ==7 ~"SAF - Still Birth",
+                                        pef_consent==1 & saf_flow_status ==8 ~"SAF - Not observed due to fasting",
+                                        pef_consent==1 & saf_flow_status ==60 ~"Refused PEF Blood visit",
+                                        pef_consent==1 & saf_flow_status ==61 ~"SAF - discontinued due to USG GA > 16  ",
+                                        pef_consent==1 & saf_flow_status ==62 ~"SAF - discontinued due to PX measure",
+                                        pef_consent==1 & saf_flow_status ==63 ~"UVF - Menstrual Regulation",
+                                        pef_consent==1 & saf_flow_status ==64 ~"UVF - Miscarriage",
+                                        pef_consent==1 & saf_flow_status ==65 ~"UVF - Refused interview",
+                                        pef_consent==1 & saf_flow_status ==66 ~"SAF - Refused",
+                                        pef_consent==1 & saf_flow_status ==67 ~"UVF - Permanent Move",
+                                        pef_consent==1 & saf_flow_status ==68 ~"UVF - Died",
+                                        pef_consent==1 & saf_flow_status ==77 ~"SAF - Permanently moved",
+                                        pef_consent==1 & saf_flow_status ==88 ~"SAF - Died",
+                                        TRUE ~as.character(NA)),
+         not_supplemented=case_when(
+           pef_consent==1 & saf_flow_status ==2 ~"Not Met",
+           # pef_consent==1 & saf_flow_status ==3 ~"Met over phone",
+           pef_consent==1 & saf_flow_status ==4 ~"Miscarriage",
+           pef_consent==1 & saf_flow_status ==5 ~"Menstrual Regulation",
+           pef_consent==1 & saf_flow_status ==6 ~"Live Birth",
+           pef_consent==1 & saf_flow_status ==7 ~"Still Birth",
+           pef_consent==1 & saf_flow_status ==8 ~"Not observed due to fasting",
+           pef_consent==1 & saf_flow_status ==60 ~"Refused PEF Blood visit",
+           pef_consent==1 & saf_flow_status ==61 ~"Discontinued due to 16 wk GA (Ultrasound)",
+           pef_consent==1 & saf_flow_status ==62 ~"Discontinued (PX)",
+           pef_consent==1 & saf_flow_status ==63 ~"Menstrual Regulation",
+           pef_consent==1 & saf_flow_status ==64 ~"Miscarriage",
+           pef_consent==1 & saf_flow_status ==65 ~"Refused Ultrasound",
+           pef_consent==1 & saf_flow_status ==66 ~"Refused",
+           pef_consent==1 & saf_flow_status ==67 ~"Permanent Move",
+           pef_consent==1 & saf_flow_status ==68 ~"Died",
+           pef_consent==1 & saf_flow_status ==69 ~"PX Data Midline Discontinuation of supplement",
+           pef_consent==1 & saf_flow_status ==70 ~"PX_Data LP Discontinuation of supplement",
+           pef_consent==1 & saf_flow_status ==71 ~"Discontinued due to 16 wk GA (Ultrasound)",
+           pef_consent==1 & saf_flow_status ==77 ~"Permanent Move",
+           pef_consent==1 & saf_flow_status ==88 ~"Died",
+           TRUE ~as.character(NA)),
+         supplemented=case_when(pef_consent==1 & saf_flow_status ==1 ~"Started Supplementation",
+                                pef_consent==1 & saf_flow_status ==3 ~"Started Supplementation",
+                                TRUE ~as.character(NA))
+  ) %>% 
+  mutate(mpf_met=case_when(!is.na(supplemented) & mpf_status ==1 & mpfb_status==1 ~"Mid-pregnancy visits",
+                           TRUE ~as.character(NA)
+  ),
+  consented2=consented,
+  mpf_not=case_when(
+    !is.na(supplemented) & mpf_status ==1 & (is.na(mpfb_status) | trimws(mpfb_status)=="") ~"Pending MPF Specimen",
+    !is.na(supplemented) & mpf_status ==1 & mpfb_status==2 ~"MPF done - MPF Specimen - Not met ",
+    !is.na(supplemented) & mpf_status ==66 ~"Refused MPF",
+    !is.na(supplemented) & mpf_status ==2 ~"Not met (up to 35 weeks GA)",
+    !is.na(supplemented) & (is.na(mpf_status) | trimws(mpf_status) =="")  & (is.na(mpfb_status) | trimws(mpfb_status)=="") & mid_preg_status== 2 ~"No supplementation before MPF",
+    !is.na(supplemented) & (is.na(mpf_status) | trimws(mpf_status) =="")  & (is.na(mpfb_status) | trimws(mpfb_status)=="") & mid_preg_status== 66 ~"Refused further study participation",
+    !is.na(supplemented) & (is.na(mpf_status) | trimws(mpf_status) =="")  & (is.na(mpfb_status) | trimws(mpfb_status)=="") & mid_preg_status== 3 ~"Outcome before the mid pregnancy visit",
+    !is.na(supplemented) & (is.na(mpf_status) | trimws(mpf_status) =="")  & (is.na(mpfb_status) | trimws(mpfb_status)=="") & mid_preg_status== 6 ~"Pending a Mid - pregnancy visit",
+    !is.na(supplemented) & (is.na(mpf_status) | trimws(mpf_status) =="")  & (is.na(mpfb_status) | trimws(mpfb_status)=="") & mid_preg_status== 8 ~"Discontinued due to PX data at the midline visit",
+    !is.na(supplemented) & (is.na(mpf_status) | trimws(mpf_status) =="")  & (is.na(mpfb_status) | trimws(mpfb_status)=="") & is.na(mid_preg_status) ~"Under follow-up",
+    !is.na(supplemented) & mpf_status ==6 ~"Still birth",
+    !is.na(supplemented) & mpf_status ==3 ~"MR",
+    !is.na(supplemented) & mpf_status ==4 ~"Miscarriage",
+    !is.na(supplemented) & mpf_status ==5 ~"Live birth",
+    TRUE ~as.character(NA))) %>% 
+  mutate(mpf_temp_out=case_when(mpf_not %in% c("Not met (up to 35 weeks GA)","No supplementation before MPF","MPF done - MPF Specimen - Not met ","Refused MPF","Under follow-up") ~as.character(mpf_not),
+                                TRUE ~as.character(NA)),
+    lpf_met=case_when(!is.na(mpf_met) & lpf_status ==1 & lpfb_status ==1 ~"Late pregnancy visits",
+                           TRUE ~as.character(NA)),
+         lpf_not=case_when(
+                           # !is.na(mpf_met) & (is.na(lpf_status) | trimws(lpf_status) =="")  & (is.na(lpfb_status) | trimws(lpfb_status)=="") & outc==5 ~"Live birth",
+                           # !is.na(mpf_met) & (is.na(lpf_status) | trimws(lpf_status) =="")  & (is.na(lpfb_status) | trimws(lpfb_status)=="") & outc==6 ~"Still birth",
+                           !is.na(mpf_met) & (is.na(lpf_status) | trimws(lpf_status) =="")  & (is.na(lpfb_status) | trimws(lpfb_status)=="") & late_preg_status==3 & outc==6 ~"Still born",
+                           !is.na(mpf_met) & (is.na(lpf_status) | trimws(lpf_status) =="")  & (is.na(lpfb_status) | trimws(lpfb_status)=="") & late_preg_status==3 & outc==8 ~"1 live born / 1 still born",
+                           !is.na(mpf_met) & (is.na(lpf_status) | trimws(lpf_status) =="")  & (is.na(lpfb_status) | trimws(lpfb_status)=="") & late_preg_status==3 & outc==5 ~"Live birth",
+                           !is.na(mpf_met) & (is.na(lpf_status) | trimws(lpf_status) =="")  & (is.na(lpfb_status) | trimws(lpfb_status)=="") & late_preg_status==3 ~"outcome before LPF visit",
+                           !is.na(mpf_met) & (is.na(lpf_status) | trimws(lpf_status) =="")  & (is.na(lpfb_status) | trimws(lpfb_status)=="") & late_preg_status==3 & (is.na(outc) | outc=="") ~"outcome before LPF visit",
+                           !is.na(mpf_met) & (is.na(lpf_status) | trimws(lpf_status) =="")  & (is.na(lpfb_status) | trimws(lpfb_status)=="") & late_preg_status==4 & (is.na(outc) | outc=="") ~"outcome happened just after LPF visit sched.",
+                           !is.na(mpf_met) & (is.na(lpf_status) | trimws(lpf_status) =="")  & (is.na(lpfb_status) | trimws(lpfb_status)=="") & late_preg_status==6 & (is.na(outc) | outc=="") ~"Not eligible for LPF visit yet",
+                           !is.na(mpf_met) & (is.na(lpf_status) | trimws(lpf_status) =="")  & (is.na(lpfb_status) | trimws(lpfb_status)=="") & outc!=5 ~"Under follow-up",
+                           !is.na(mpf_met) & lpf_status ==1 & (is.na(lpfb_status) | trimws(lpfb_status)=="") ~"Pending LPF Specimen",
+                           !is.na(mpf_met) & lpf_status ==66 ~"Refused LPF",
+                           !is.na(mpf_met) & lpf_status ==2 ~"Not met (up to any outcome)",
+                           !is.na(mpf_met) & lpf_status ==6 ~"Still birth",
+                           !is.na(mpf_met) & lpf_status ==3 ~"MR",
+                           !is.na(mpf_met) & lpf_status ==4 ~"Miscarriage",
+                           !is.na(mpf_met) & lpf_status ==5 ~"Live birth",
+                           TRUE ~as.character(NA))) %>% 
+  mutate(mpf_not=case_when(!is.na(mpf_temp_out) ~as.character(NA),
+                           TRUE ~as.character(mpf_not)),
+    live_births=case_when(!is.na(lpf_met) & outc==5 ~"Live birth",
+                               TRUE ~as.character(NA)),
+         live_births_not=case_when(!is.na(lpf_met) & (is.na(outc) | trimws(outc) =="") ~"Pending outcome",
+                                   !is.na(lpf_met) & outc =="02" ~"Miscarriage",
+                                   !is.na(lpf_met) & lpf_status =="06" ~"Still birth",
+                                   !is.na(lpf_met) & lpf_status =="00" ~"No outcome reported",
+                                   TRUE ~as.character(NA)))
+
+
+
+
+# data(dispos.data)
+# df <- dispos.data[!dispos.data$arm3 %in% "Trt C", ]
+
+p <- consort_plot(
+  data = wtrak_pw_prepped,
+  orders = list(
+    c(uid = "Women eligible for pregnancy surveillance"),
+    c(pregnant = "Pregnancies detected"),
+    c(pef_not_consented = ""),
+    # c(consented = "Pregnant Women consented and randomized"),
+    c(arm_pw = "Pregnant Women consented and randomized"),
+    c(consented2 = "Pregnant Women enrolled"),
+    c(not_supplemented = ""),
+    c(supplemented = "Started supplementation"),
+    # c(mpf_temp_out = "Temporary takeout after supplementation"),  # Add as main flow
+    c(mpf_not = ""),
+    c(mpf_met = "Mid-pregnancy visits"),
+    c(lpf_not = ""),
+    c(lpf_met = "Late-pregnancy visits"),
+    c(live_births_not = ""),
+    c(live_births = "Pregnancies with live infants")
+  ),
+  side_box = c("pef_not_consented", "not_supplemented", "mpf_not", "lpf_not", "live_births_not"),
+  allocation = c("arm_pw"),
+  labels = c("3" = "Randomization", "5" = "Enrollment", "9" = "Outcomes"),
+  cex = 1.5
+)
+
+
+# Plot the consort diagram
+plot(p)
+
+
+
+
+
+# Consort option 2 
+
+eligible <-  nrow(wtrak_pw_prepped)
+
+txt1 <- paste0("Women eligible for pregnancy surveillance (n=",eligible,")")
+txt1_side <- "Excluded (n=15):\n\u2022 MRI not collected (n=3)\n\u2022 Tissues not collected (n=4)\n\u2022 Other (n=8)"
+
+# supports pipeline operator
+g <- add_box(txt = txt1) |>
+  add_side_box(txt = txt1_side) |> 
+  add_box(txt = "Randomized (n=200)") |> 
+  add_split(txt = c("Arm A (n=100)", "Arm B (n=100)")) |> 
+  add_side_box(txt = c("Excluded (n=15):\n\u2022 MRI not collected (n=3)\n\u2022 Tissues not collected (n=4)\n\u2022 Other (n=8)",
+                       "Excluded (n=7):\n\u2022 MRI not collected (n=3)\n\u2022 Tissues not collected (n=4)")) |> 
+  add_box(txt = c("Final analysis (n=85)", "Final analysis (n=93)")) |> 
+  add_label_box(txt = c("1" = "Screening",
+                        "3" = "Randomized",
+                        "4" = "Final analysis"))
+plot(g)
+
+
+```

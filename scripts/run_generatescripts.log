@@ -1,0 +1,7902 @@
+
+  ___  ____  ____  ____  ____ ®
+ /__    /   ____/   /   ____/      17.0
+___/   /   /___/   /   /___/       BE—Basic Edition
+
+ Statistics and Data Science       Copyright 1985-2021 StataCorp LLC
+                                   StataCorp
+                                   4905 Lakeway Drive
+                                   College Station, Texas 77845 USA
+                                   800-STATA-PC        https://www.stata.com
+                                   979-696-4600        stata@stata.com
+
+Stata license: 40-student lab perpetual
+Serial number: 301706316352
+  Licensed to: Biostat
+               Johns Hopkins University
+
+Notes:
+      1. Stata is running in batch mode.
+      2. Unicode is supported; see help unicode_advice.
+
+. do "C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MINDR\data\scripts\run
+> _generatescripts.do" 
+
+. cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. 
+. 
+. do generate_aef_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*aef_pw*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\aef_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\aef_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:02
+
+. odbc load,exec("
+> SELECT
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> womname,
+> husbname,
+> idenconf,
+> aefdate,
+> workerid,
+> aeperson,
+> childuid,
+> childname,
+> aestatus,
+> aeevent,
+> aediag,
+> aeondate,
+> aedescpt,
+> aefevntsum,
+> aelocate,
+> aeunexp,
+> aerel,
+> aeurel,
+> aedisc,
+> aehoscause,
+> aeact,
+> aeacts,
+> aelist,
+> version,
+> today,
+> start,
+> [end],
+> insert_time,
+> update_time,
+> _submission_time,
+> _date_modified,
+> scheduleid,
+> instanceid,
+> _id,
+> _uuid
+> /*duplicate*/
+> FROM     [mindr-live].dbo.aef_pw_mv
+> ") dsn("rammps");
+
+. fixdate aefdate aeondate;
+(18 real changes made)
+(18 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. //Calculate the number of splits needed
+. local max_length_an = 242
+
+. local num_splits_an = ceil(strlen(aedescpt) / `max_length_an')+1
+
+. 
+. //Create new variables to hold the splits
+. forval i = 1/`num_splits_an' {
+  2.     gen aedescpt`i' = substr(aedescpt, (`i' - 1) * `max_length_an' + 1, `m
+> ax_length_an')
+  3.     order aedescpt`i', before(aedescpt)
+  4. }
+(1 missing value generated)
+
+. 
+. 
+. drop aedescpt
+
+. 
+. //Calculate the number of splits needed
+. local max_length_an = 242
+
+. local num_splits_an = ceil(strlen(aefevntsum) / `max_length_an')+1
+
+. 
+. //Create new variables to hold the splits
+. forval i = 1/`num_splits_an' {
+  2.     gen aefevntsum`i' = substr(aefevntsum, (`i' - 1) * `max_length_an' + 1
+> , `max_length_an')
+  3.     order aefevntsum`i', before(aefevntsum)
+  4. }
+(6 missing values generated)
+(13 missing values generated)
+(17 missing values generated)
+
+. 
+. drop aefevntsum
+
+. 
+. 
+. save "..\datasets\stata\aef_pw.dta", replace
+file ..\datasets\stata\aef_pw.dta saved
+
+. saveold "..\datasets\stata\aef_pw.dta",replace version(12) 
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\aef_pw.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\aef_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:02
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. /*do generate_aef_wra.do -- no wra aef data*/
+. do generate_bnf.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*bnf*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\bnf.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\bnf.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:02
+
+. odbc load,exec("
+> SELECT
+> [UID],
+> [VERSION],
+> [today],
+> [start],
+> [end],
+> scheduleID ,
+> SUBmm,
+> SUByy,
+> todaymmyy,
+> tlpin,
+> Sector,
+> HHID,
+> HHCHANGE,
+> NEWHHID,
+> jw.JiVitaWeek AS pewkint ,
+> convert(smalldatetime,bnfdate,121) as bnfdate,
+> /*
+> womname,
+> husbname,
+> */
+> IDENCONF,
+> workerid,
+> BNFTYPE,
+> BNFNB,
+> BNFCHLDVITSTS1,
+> BNFCHLDVITSTS2,
+> BNFCHLDVITSTS3,
+> BNFDTOO,
+> BNFCLOC,
+> BNFRELADDR,
+> BNFRELHMEA,
+> BNFNFAC,
+> BNFNFACA,
+> BNFWOMCALL,
+> BNFWOMMOB,
+> BNFWOMMOB_2
+> 
+> FROM     [mindr-live].dbo.all_bnf INNER JOIN
+>                   shapla.dbo.JiVitAWeek AS jw ON jw.RomanDate = CONVERT(small
+> datetime, all_bnf.bnfdate, 121)
+> WHERE  (all_bnf.duplicate IS NULL)
+> ") dsn("rammps");
+
+. fixdate bnfdate;
+(294 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\bnf.dta", replace
+file ..\datasets\stata\bnf.dta saved
+
+. saveold "..\datasets\stata\bnf.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\bnf.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\bnf.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:02
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_drf_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*drf*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\drf.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\drf.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:02
+
+. odbc load,exec("
+> select 
+> d.uid,
+> case when p.allocated_arm = 'A' then 'Y'
+> when p.allocated_arm = 'B' then 'W'
+> when p.allocated_arm = 'C' then 'Z'
+> when p.allocated_arm = 'D' then 'X' end as 
+> arm,
+> d.tlpin,
+> d.sector,
+> d.hhid,
+> convert(smalldatetime,drdate,121) as wmdate,
+> workerid,
+> drstatus,
+> drvstype,
+> drsick,
+> drappt,
+> drfast,
+> drfest,
+> convert(smalldatetime,drydate,121) as drydate,
+> dryday,
+> drtabtyp,
+> drfoodgrp,
+> dritemcode,
+> drunkfoods,
+> drfoodt,
+> drfoodti,
+> drfoodw,
+> drfoodwr,
+> drmixveg,
+> drfoodscan,
+> drfoodcons,
+> drtabn
+> from [mindr-live].dbo.pw_drf d
+> left join [mindr-live].dbo.woman_pw p on p.uid = d.uid
+> ") dsn("rammps");
+
+. fixdate wmdate drydate;
+(14,033 real changes made)
+(14,033 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. 
+. foreach v of varlist dr* {
+  2.      if !inlist("`v'", "drdate","drydate","drtabn","drvstype","dryday","dr
+> unkfoods","drmixveg") {
+  3.             replace `v' = "" if (`v' == "n/a" )
+  4.         destring `v', force replace
+  5.      }
+  6. }
+(0 real changes made)
+drstatus: all characters numeric; replaced as byte
+(0 real changes made)
+drsick: all characters numeric; replaced as byte
+(0 real changes made)
+drappt: contains nonnumeric characters; replaced as byte
+(13487 missing values generated)
+(0 real changes made)
+drfast: all characters numeric; replaced as byte
+(0 real changes made)
+drfest: all characters numeric; replaced as byte
+(0 real changes made)
+drtabtyp: all characters numeric; replaced as byte
+(13770 missing values generated)
+(0 real changes made)
+drfoodgrp: contains nonnumeric characters; replaced as byte
+(263 missing values generated)
+(0 real changes made)
+dritemcode: contains nonnumeric characters; replaced as long
+(263 missing values generated)
+(0 real changes made)
+drfoodt: contains nonnumeric characters; replaced as byte
+(263 missing values generated)
+(0 real changes made)
+drfoodti: contains nonnumeric characters; replaced as byte
+(263 missing values generated)
+(0 real changes made)
+drfoodw: contains nonnumeric characters; replaced as byte
+(263 missing values generated)
+(0 real changes made)
+drfoodwr: contains nonnumeric characters; replaced as byte
+(263 missing values generated)
+(0 real changes made)
+drfoodscan: contains nonnumeric characters; replaced as int
+(1335 missing values generated)
+(0 real changes made)
+drfoodcons: contains nonnumeric characters; replaced as double
+(9380 missing values generated)
+
+. 
+. 
+. * Trim spaces
+. replace drunkfoods = strtrim(itrim(drunkfoods))
+(14,033 real changes made)
+
+. 
+. * 2. Create a helper variable with string lengths
+. gen _len = length(drunkfoods)
+
+. 
+. * 3. Get the maximum length
+. summarize _len
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+        _len |     14,033    .2023088    1.608811          0         55
+
+. local maxlen = r(max)
+
+. 
+. * 4. Resize the variable
+. recast str`maxlen' drunkfoods
+
+. 
+. * 5. Clean up helper
+. drop _len
+
+. 
+. 
+. 
+. 
+. 
+. replace drvstype = strtrim(drvstype)
+(14,033 real changes made)
+
+. replace drvstype = lower(drvstype)
+(14,033 real changes made)
+
+. gen drvstype_num = .
+(14,033 missing values generated)
+
+. replace drvstype_num = 1 if inlist(drvstype, "baseline_visit")
+(4,130 real changes made)
+
+. replace drvstype_num = 2 if inlist(drvstype, "replicate_visit")
+(0 real changes made)
+
+. replace drvstype_num = 3 if inlist(drvstype, "endline_visit")
+(0 real changes made)
+
+. drop drvstype
+
+. order drvstype_num, after(drstatus)
+
+. rename drvstype_num drvstype
+
+. 
+. 
+. replace dryday = strtrim(dryday)
+(14,033 real changes made)
+
+. replace dryday = lower(dryday)
+(14,033 real changes made)
+
+. gen dryday_num = .
+(14,033 missing values generated)
+
+. replace dryday_num = 1 if inlist(dryday,"sunday")
+(3,044 real changes made)
+
+. replace dryday_num = 2 if inlist(dryday,"monday")
+(2,703 real changes made)
+
+. replace dryday_num = 3 if inlist(dryday,"tuesday")
+(2,521 real changes made)
+
+. replace dryday_num = 4 if inlist(dryday,"wednesday")
+(2,234 real changes made)
+
+. replace dryday_num = 5 if inlist(dryday,"thursday")
+(89 real changes made)
+
+. replace dryday_num = 6 if inlist(dryday,"friday")
+(0 real changes made)
+
+. replace dryday_num = 7 if inlist(dryday,"saturday")
+(3,442 real changes made)
+
+. drop dryday
+
+. order dryday_num, after(drydate)
+
+. rename dryday_num dryday
+
+. 
+. * 0. Normalize: trim, collapse internal spaces, and lowercase
+. replace drmixveg = strtrim(itrim(lower(drmixveg)))
+(14,032 real changes made)
+
+. 
+. * 1. Treat empty / n/a as missing string
+. replace drmixveg = "" if inlist(drmixveg, "", "n/a", "na", "n.a.")
+(13,435 real changes made)
+
+. 
+. * 2. Ensure target vars exist and are cleared (use wider width first, recast 
+> later)
+. forvalues i = 1/7 {
+  2.     capture confirm var drmixveg_`i'
+  3.     if _rc gen str10 drmixveg_`i' = ""
+  4.     else    replace   drmixveg_`i' = ""
+  5. }
+(14,033 missing values generated)
+(14,033 missing values generated)
+(14,033 missing values generated)
+(14,033 missing values generated)
+(14,033 missing values generated)
+(14,033 missing values generated)
+(14,033 missing values generated)
+
+. 
+. * 3. Split non-missing rows into up to 7 tokens (space-delimited)
+. split drmixveg if drmixveg != "", parse(" ") gen(_tmp_) limit(7)
+variables created as string: 
+_tmp_1  _tmp_2  _tmp_3  _tmp_4  _tmp_5  _tmp_6  _tmp_7
+
+. 
+. * 4. Move tokens into final vars, keep only two-digit numeric codes; else set
+>  missing
+. forvalues i = 1/7 {
+  2.     replace drmixveg_`i' = _tmp_`i'
+  3.     replace drmixveg_`i' = "" if !regexm(drmixveg_`i', "^[0-9][0-9]$")
+  4. }
+(441 real changes made)
+(0 real changes made)
+(403 real changes made)
+(0 real changes made)
+(327 real changes made)
+(0 real changes made)
+(87 real changes made)
+(0 real changes made)
+(16 real changes made)
+(0 real changes made)
+(3 real changes made)
+(0 real changes made)
+(1 real change made)
+(0 real changes made)
+
+. 
+. * 5. Recast to exact width 2 (now that values are validated)
+. forvalues i = 1/7 {
+  2.     recast str2 drmixveg_`i'
+  3. }
+
+. 
+. * 6. Clean up
+. drop _tmp_*
+
+. 
+. order  drmixveg_1 drmixveg_2 drmixveg_3 drmixveg_4 drmixveg_5 drmixveg_6 drmi
+> xveg_7, after(drmixveg)
+
+. 
+. drop drmixveg
+
+. 
+. 
+. save "..\datasets\stata\drf_pw.dta", replace
+file ..\datasets\stata\drf_pw.dta saved
+
+. saveold "..\datasets\stata\drf_pw.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\drf_pw.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\drf.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:06
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_drf_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*drf*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\drf.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\drf.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:06
+
+. odbc load,exec("
+> select 
+> d.uid,
+> case when p.allocated_arm = 'A' then 'Y'
+> when p.allocated_arm = 'B' then 'W'
+> when p.allocated_arm = 'C' then 'Z'
+> when p.allocated_arm = 'D' then 'X' end as 
+> arm,
+> d.tlpin,
+> d.sector,
+> d.hhid,
+> convert(smalldatetime,drdate,121) as wmdate,
+> workerid,
+> drstatus,
+> 
+> drvstype,
+> drsick,
+> drappt,
+> drfast,
+> drfest,
+> convert(smalldatetime,drydate,121) as drydate,
+> dryday,
+> drtabtyp,
+> drfoodgrp,
+> dritemcode,
+> drunkfoods,
+> drfoodt,
+> drfoodti,
+> drfoodw,
+> drfoodwr,
+> drmixveg,
+> drfoodscan,
+> drfoodcons,
+> drtabn
+> from [mindr-live].dbo.wra_drf d
+> left join [mindr-live].dbo.woman_wra p on p.uid = d.uid
+> ") dsn("rammps");
+
+. fixdate wmdate drydate;
+(6,218 real changes made)
+(6,218 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. 
+. foreach v of varlist dr* {
+  2.      if !inlist("`v'", "drdate","drydate","drtabn","drvstype","dryday","dr
+> unkfoods","drmixveg") {
+  3.             replace `v' = "" if (`v' == "n/a" )
+  4.         destring `v', force replace
+  5.      }
+  6. }
+(0 real changes made)
+drstatus: all characters numeric; replaced as byte
+(0 real changes made)
+drsick: all characters numeric; replaced as byte
+(0 real changes made)
+drappt: contains nonnumeric characters; replaced as byte
+(6073 missing values generated)
+(0 real changes made)
+drfast: all characters numeric; replaced as byte
+(0 real changes made)
+drfest: all characters numeric; replaced as byte
+(0 real changes made)
+drtabtyp: all characters numeric; replaced as byte
+(6204 missing values generated)
+(0 real changes made)
+drfoodgrp: contains nonnumeric characters; replaced as byte
+(14 missing values generated)
+(0 real changes made)
+dritemcode: contains nonnumeric characters; replaced as long
+(14 missing values generated)
+(0 real changes made)
+drfoodt: contains nonnumeric characters; replaced as byte
+(14 missing values generated)
+(0 real changes made)
+drfoodti: contains nonnumeric characters; replaced as byte
+(14 missing values generated)
+(0 real changes made)
+drfoodw: contains nonnumeric characters; replaced as byte
+(14 missing values generated)
+(0 real changes made)
+drfoodwr: contains nonnumeric characters; replaced as byte
+(14 missing values generated)
+(0 real changes made)
+drfoodscan: contains nonnumeric characters; replaced as int
+(381 missing values generated)
+(0 real changes made)
+drfoodcons: contains nonnumeric characters; replaced as double
+(4389 missing values generated)
+
+. 
+. 
+. * Trim spaces
+. replace drunkfoods = strtrim(itrim(drunkfoods))
+(6,218 real changes made)
+
+. 
+. * 2. Create a helper variable with string lengths
+. gen _len = length(drunkfoods)
+
+. 
+. * 3. Get the maximum length
+. summarize _len
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+        _len |      6,218     .170312    1.724775          0         47
+
+. local maxlen = r(max)
+
+. 
+. * 4. Resize the variable
+. recast str`maxlen' drunkfoods
+
+. 
+. * 5. Clean up helper
+. drop _len
+
+. 
+. 
+. 
+. 
+. 
+. replace drvstype = strtrim(drvstype)
+(6,218 real changes made)
+
+. replace drvstype = lower(drvstype)
+(6,218 real changes made)
+
+. gen drvstype_num = .
+(6,218 missing values generated)
+
+. replace drvstype_num = 1 if inlist(drvstype, "baseline_visit")
+(2,854 real changes made)
+
+. replace drvstype_num = 2 if inlist(drvstype, "replicate_visit")
+(899 real changes made)
+
+. replace drvstype_num = 3 if inlist(drvstype, "endline_visit")
+(2,465 real changes made)
+
+. drop drvstype
+
+. order drvstype_num, after(drstatus)
+
+. rename drvstype_num drvstype
+
+. 
+. 
+. replace dryday = strtrim(dryday)
+(6,218 real changes made)
+
+. replace dryday = lower(dryday)
+(6,218 real changes made)
+
+. gen dryday_num = .
+(6,218 missing values generated)
+
+. replace dryday_num = 1 if inlist(dryday,"sunday")
+(1,511 real changes made)
+
+. replace dryday_num = 2 if inlist(dryday,"monday")
+(1,168 real changes made)
+
+. replace dryday_num = 3 if inlist(dryday,"tuesday")
+(1,204 real changes made)
+
+. replace dryday_num = 4 if inlist(dryday,"wednesday")
+(875 real changes made)
+
+. replace dryday_num = 5 if inlist(dryday,"thursday")
+(126 real changes made)
+
+. replace dryday_num = 6 if inlist(dryday,"friday")
+(0 real changes made)
+
+. replace dryday_num = 7 if inlist(dryday,"saturday")
+(1,334 real changes made)
+
+. drop dryday
+
+. order dryday_num, after(drydate)
+
+. rename dryday_num dryday
+
+. 
+. * 0. Normalize: trim, collapse internal spaces, and lowercase
+. replace drmixveg = strtrim(itrim(lower(drmixveg)))
+(6,218 real changes made)
+
+. 
+. * 1. Treat empty / n/a as missing string
+. replace drmixveg = "" if inlist(drmixveg, "", "n/a", "na", "n.a.")
+(5,954 real changes made)
+
+. 
+. * 2. Ensure target vars exist and are cleared (use wider width first, recast 
+> later)
+. forvalues i = 1/6 {
+  2.     capture confirm var drmixveg_`i'
+  3.     if _rc gen str10 drmixveg_`i' = ""
+  4.     else    replace   drmixveg_`i' = ""
+  5. }
+(6,218 missing values generated)
+(6,218 missing values generated)
+(6,218 missing values generated)
+(6,218 missing values generated)
+(6,218 missing values generated)
+(6,218 missing values generated)
+
+. 
+. * 3. Split non-missing rows into up to 6 tokens (space-delimited)
+. split drmixveg if drmixveg != "", parse(" ") gen(_tmp_) limit(6)
+variables created as string: 
+_tmp_1  _tmp_2  _tmp_3  _tmp_4  _tmp_5  _tmp_6
+
+. 
+. * 4. Move tokens into final vars, keep only two-digit numeric codes; else set
+>  missing
+. forvalues i = 1/6 {
+  2.     replace drmixveg_`i' = _tmp_`i'
+  3.     replace drmixveg_`i' = "" if !regexm(drmixveg_`i', "^[0-9][0-9]$")
+  4. }
+(194 real changes made)
+(0 real changes made)
+(179 real changes made)
+(0 real changes made)
+(155 real changes made)
+(0 real changes made)
+(47 real changes made)
+(0 real changes made)
+(5 real changes made)
+(0 real changes made)
+(2 real changes made)
+(0 real changes made)
+
+. 
+. * 5. Recast to exact width 2 (now that values are validated)
+. forvalues i = 1/6 {
+  2.     recast str2 drmixveg_`i'
+  3. }
+
+. 
+. * 6. Clean up
+. drop _tmp_*
+
+. 
+. order  drmixveg_1 drmixveg_2 drmixveg_3 drmixveg_4 drmixveg_5 drmixveg_6, aft
+> er(drmixveg)
+
+. 
+. drop drmixveg
+
+. 
+. save "..\datasets\stata\drf_wra.dta", replace
+file ..\datasets\stata\drf_wra.dta saved
+
+. saveold "..\datasets\stata\drf_wra.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\drf_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\drf.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:07
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_fbaf.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*fbaf*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\fbaf.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\fbaf.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:07
+
+. odbc load,exec("
+> SELECT
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> fbwkint,
+> fbdate,
+> womname,
+> husbname,
+> workerid,
+> childuid,
+> childname,
+> childno,
+> fbsex,
+> fbrelat1,
+> fbstatus,
+> fbdob,
+> fbbtimehr,
+> fbbtimemn,
+> fbbtimeap,
+> fbdod,
+> fbdtimehr,
+> fbdtimemn,
+> fbdtimeap,
+> fbatimehr,
+> fbatimemn,
+> fbatimeap,
+> fbweight,
+> fbmuac1,
+> fbmuac2,
+> fbmuac3,
+> fbcc1,
+> fbcc2,
+> fbcc3,
+> fbhc1,
+> fbhc2,
+> fbhc3,
+> fbheight1,
+> fbheight2,
+> fbheight3,
+> version,
+> today,
+> start,
+> [end],
+> scheduleid,
+> idenconf,
+> insert_time,
+> update_time,
+> inserted_by,
+> updateed_by,
+> _submission_time,
+> _submitted_by,
+> _date_modified,
+> _xform_id,
+> instanceid,
+> _duration,
+> _media_all_received,
+> _media_count,
+> _id,
+> _uuid,
+> _version,
+> duplicate
+> FROM     [mindr-live].dbo.fbaf_mv
+> ") dsn("rammps");
+
+. fixdate fbdate fbdob fbdod;
+(133 real changes made)
+(131 real changes made)
+(1 real change made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\fbaf.dta", replace
+file ..\datasets\stata\fbaf.dta saved
+
+. saveold "..\datasets\stata\fbaf.dta",replace version(12)  
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\fbaf.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\fbaf.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:07
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_i1mop.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*i1mop*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\i1mop.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\i1mop.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:07
+
+. odbc load,exec("
+> SELECT
+> uid,
+> childuid,
+> tlpin,
+> sector,
+> hhid,
+> womname,
+> childname,
+> husbname,
+> i1wkint,
+> i1date,
+> workerid,
+> i1relat1,
+> i1status,
+> i1dod,
+> i1pneum,
+> i1pneumt,
+> i1pneum7,
+> i1diar,
+> i1diart,
+> i1diar7,
+> i1dys,
+> i1dyst,
+> i1dys7,
+> i1hfvr,
+> i1hfvrt,
+> i1hfvr7,
+> i1bfed,
+> i1bfedever,
+> i1sbfed,
+> i1sbfedd,
+> i1sbfedw,
+> i1bfhr,
+> i1bfclst,
+> i1bftime,
+> i1bfsuff,
+> i1edrop,
+> i1edroph,
+> i1eamilk,
+> i1eamilkh,
+> i1eswater,
+> i1eswaterh,
+> i1ewater,
+> i1ewaterh,
+> i1eghee,
+> iegheeh,
+> i1ehoney,
+> i1ehoneyh,
+> i1epmilk,
+> i1epmilkh,
+> i1eformu,
+> i1eformuh,
+> i1eothf,
+> i1eothfs,
+> i1eothfh,
+> i1amilk,
+> i1amilkd,
+> i1amilkt,
+> i1pmilk,
+> i1pmilkd,
+> i1pmilkt,
+> i1omilk,
+> i1omilkd,
+> i1omilkt,
+> i1formu,
+> i1formud,
+> i1formut,
+> i1swater,
+> i1swaterd,
+> i1swatert,
+> i1water,
+> i1waterd,
+> i1watert,
+> i1honey,
+> i1honeyd,
+> i1honeyt,
+> i1othf,
+> i1othfs,
+> i1othfd,
+> i1othft,
+> i1weight,
+> i1muac1,
+> i1muac2,
+> i1muac3,
+> i1cc1,
+> i1cc2,
+> i1cc3,
+> i1hc1,
+> i1hc2,
+> i1hc3,
+> i1height1,
+> i1height2,
+> i1height3,
+> version,
+> today,
+> start,
+> [end],
+> hhchange,
+> newhhid,
+> idenconf,
+> insert_time,
+> update_time,
+> inserted_by,
+> updateed_by,
+> _submission_time,
+> _submitted_by,
+> _date_modified,
+> _xform_id,
+> instanceid,
+> _duration,
+> _media_all_received,
+> _media_count,
+> _id,
+> _uuid,
+> _version,
+> duplicate
+> FROM     [mindr-live].dbo.i1mop_mv
+> ") dsn("rammps");
+
+. fixdate i1date i1dod;
+(282 real changes made)
+(2 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\i1mop.dta", replace
+file ..\datasets\stata\i1mop.dta saved
+
+. saveold "..\datasets\stata\i1mop.dta",replace version(12) 
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\i1mop.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\i1mop.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:08
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_ibaf.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*ibaf*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\ibaf.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\ibaf.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:08
+
+. odbc load,exec("
+> SELECT
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> ibwkint,
+> ibdate,
+> /*womname,*/
+> /*husbname,*/
+> workerid,
+> childuid,
+> childname,
+> childno,
+> ibsex,
+> ibrelat1,
+> ibstatus,
+> ibdob,
+> ibbtimehr,
+> ibbtimemn,
+> ibbtimeap,
+> ibdod,
+> ibdtimehr,
+> ibdtimemn,
+> ibdtimeap,
+> ibpart,
+> ibparts,
+> ibstuck,
+> ibneck,
+> ibbrth,
+> ibcry1,
+> ibcry1s,
+> ibcry2,
+> ibcry2s,
+> ibcry3,
+> ibcry3s,
+> ibbrthc,
+> iblimb,
+> ibblue,
+> ibblueh,
+> ibbluef,
+> ibbluel,
+> ibblueb,
+> ibbfed,
+> ibbfedw,
+> ibbfhr,
+> ibbfclst,
+> ibbfoth1,
+> ibbfoth1s,
+> ibatimehr,
+> ibatimemn,
+> ibatimeap,
+> ibweight,
+> ibmuac1,
+> ibmuac2,
+> ibmuac3,
+> ibcc1,
+> ibcc2,
+> ibcc3,
+> ibhc1,
+> ibhc2,
+> ibhc3,
+> ibheight1,
+> ibheight2,
+> ibheight3,
+> version,
+> today,
+> start,
+> [end],
+> scheduleid,
+> idenconf,
+> insert_time,
+> update_time,
+> inserted_by,
+> updateed_by,
+> _submission_time,
+> _submitted_by,
+> _date_modified,
+> _xform_id,
+> instanceid,
+> _duration,
+> _media_all_received,
+> _media_count,
+> _id,
+> _uuid,
+> _version,
+> duplicate
+> FROM     [mindr-live].dbo.ibaf_mv
+> ") dsn("rammps");
+
+. fixdate ibdate ibdob ibdod;
+(289 real changes made)
+(282 real changes made)
+(8 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\ibaf.dta", replace
+file ..\datasets\stata\ibaf.dta saved
+
+. saveold "..\datasets\stata\ibaf.dta",replace version(12) 
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\ibaf.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\ibaf.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:08
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_lab_proc_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*lab_proc_pw*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\lab_proc_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_proc_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:08
+
+. odbc load,exec("
+> SELECT
+> lp.id,
+> lp.insert_time,
+> lp.inserted_by,
+> lp.update_time,
+> lp.updateed_by,
+> lp.buffy_coat,
+> lp.hemt_stataa,
+> lp.hemt_statab,
+> lp.ltid,
+> lp.rbc_status,
+> lp.sample_type,
+> lp.aliquot_id,
+> lp.specimenid,
+> lp.spec_volume,
+> lp.study_type,
+> lp.urin_color,
+> lp.visit_type
+> FROM [mindr-live].dbo.lab_process lp
+> left join [mindr-live].dbo.lab_recv lr on lr.specimenid = lp.specimenid
+> inner join [mindr-live].dbo.wtrak_pw wtp on wtp.uid = lr.uid  
+> ") dsn("rammps");
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\lab_proc_pw.dta", replace
+file ..\datasets\stata\lab_proc_pw.dta saved
+
+. saveold "..\datasets\stata\lab_proc_pw.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\lab_proc_pw.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_proc_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:08
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_lab_proc_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*lab_proc*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\lab_proc_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_proc_wra.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:08
+
+. odbc load,exec("
+> SELECT
+> lp.id,
+> lp.insert_time,
+> lp.inserted_by,
+> lp.update_time,
+> lp.updateed_by,
+> lp.buffy_coat,
+> lp.hemt_stataa,
+> lp.hemt_statab,
+> lp.ltid,
+> lp.rbc_status,
+> lp.sample_type,
+> lp.aliquot_id,
+> lp.specimenid,
+> lp.spec_volume,
+> lp.study_type,
+> lp.urin_color,
+> lp.visit_type
+> FROM [mindr-live].dbo.lab_process lp
+> left join [mindr-live].dbo.lab_recv lr on lr.specimenid = lp.specimenid
+> inner join [mindr-live].dbo.wtrak_wra wta on wta.uid = lr.uid  
+> ") dsn("rammps");
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\lab_proc_wra.dta", replace
+file ..\datasets\stata\lab_proc_wra.dta saved
+
+. saveold "..\datasets\stata\lab_proc_wra.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\lab_proc_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_proc_wra.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:08
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_lab_proc.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*lab_proc*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\lab_proc.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_proc.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:08
+
+. odbc load,exec("
+> SELECT
+> id,
+> insert_time,
+> inserted_by,
+> update_time,
+> updateed_by,
+> buffy_coat,
+> hemt_stataa,
+> hemt_statab,
+> ltid,
+> rbc_status,
+> sample_type,
+> aliquot_id,
+> specimenid,
+> spec_volume,
+> study_type,
+> urin_color,
+> visit_type
+> FROM [mindr-live].dbo.lab_process
+> ") dsn("rammps");
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\lab_proc.dta", replace
+file ..\datasets\stata\lab_proc.dta saved
+
+. saveold "..\datasets\stata\lab_proc.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\lab_proc.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_proc.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:08
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_lab_recv_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*lab_recv_pw*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\lab_recv_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_recv_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:08
+
+. odbc load,exec("
+> SELECT
+> id,
+> insert_time,
+> inserted_by,
+> update_time,
+> updateed_by,
+> cremt_1st,
+> cremt_2nd,
+> hem_stata,
+> ltid,
+> sample_type,
+> specimenid,
+> specimen_stata,
+> specimen_volume,
+> study_type,
+> lr.uid,
+> visit_type
+> FROM [mindr-live].dbo.lab_recv lr 
+> inner join [mindr-live].dbo.wtrak_pw wtp on wtp.uid = lr.uid  
+> ") dsn("rammps");
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\lab_recv_pw.dta", replace
+file ..\datasets\stata\lab_recv_pw.dta saved
+
+. saveold "..\datasets\stata\lab_recv_pw.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\lab_recv_pw.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_recv_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:09
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_lab_recv_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*lab_recv_wra*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\lab_recv_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_recv_wra.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:09
+
+. odbc load,exec("
+> SELECT
+> id,
+> insert_time,
+> inserted_by,
+> update_time,
+> updateed_by,
+> cremt_1st,
+> cremt_2nd,
+> hem_stata,
+> ltid,
+> sample_type,
+> specimenid,
+> specimen_stata,
+> specimen_volume,
+> study_type,
+> lr.uid,
+> visit_type
+> FROM [mindr-live].dbo.lab_recv lr 
+> inner join [mindr-live].dbo.wtrak_wra wta on wta.uid = lr.uid 
+> ") dsn("rammps");
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\lab_recv_wra.dta", replace
+file ..\datasets\stata\lab_recv_wra.dta saved
+
+. saveold "..\datasets\stata\lab_recv_wra.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\lab_recv_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_recv_wra.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:09
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_lab_recv.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*lab_recv*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\lab_recv.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_recv.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:09
+
+. odbc load,exec("
+> SELECT
+> id,
+> insert_time,
+> inserted_by,
+> update_time,
+> updateed_by,
+> cremt_1st,
+> cremt_2nd,
+> hem_stata,
+> ltid,
+> sample_type,
+> specimenid,
+> specimen_stata,
+> specimen_volume,
+> study_type,
+> uid,
+> visit_type
+> FROM [mindr-live].dbo.lab_recv
+> ") dsn("rammps");
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\lab_recv.dta", replace
+file ..\datasets\stata\lab_recv.dta saved
+
+. saveold "..\datasets\stata\lab_recv.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\lab_recv.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_recv.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:09
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_lab_store_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*lab_store_pw*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\lab_store_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_store_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:09
+
+. odbc load,exec("
+> SELECT
+> ls.id,
+> ls.insert_time,
+> ls.inserted_by,
+> ls.update_time,
+> ls.updateed_by,
+> aliquot_id,
+> box_id,
+> cell_number,
+> ls.ltid,
+> ls.sample_type,
+> ls.specimenid,
+> ls.study_type,
+> ls.visit_type
+> FROM [mindr-live].dbo.lab_store ls 
+> left join [mindr-live].dbo.lab_recv lr on lr.specimenid = ls.specimenid
+> inner join [mindr-live].dbo.wtrak_pw wp on wp.uid = lr.uid 
+> ") dsn("rammps");
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\lab_store_pw.dta", replace
+file ..\datasets\stata\lab_store_pw.dta saved
+
+. saveold "..\datasets\stata\lab_store_pw.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\lab_store_pw.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_store_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:09
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_lab_store_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*lab_store_wra*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\lab_store_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_store_wra.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:09
+
+. odbc load,exec("
+> SELECT
+> ls.id,
+> ls.insert_time,
+> ls.inserted_by,
+> ls.update_time,
+> ls.updateed_by,
+> aliquot_id,
+> box_id,
+> cell_number,
+> ls.ltid,
+> ls.sample_type,
+> ls.specimenid,
+> ls.study_type,
+> ls.visit_type
+> FROM [mindr-live].dbo.lab_store ls 
+> left join [mindr-live].dbo.lab_recv lr on lr.specimenid = ls.specimenid
+> inner join [mindr-live].dbo.wtrak_wra wta on wta.uid = lr.uid 
+> ") dsn("rammps");
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\lab_store_wra.dta", replace
+file ..\datasets\stata\lab_store_wra.dta saved
+
+. saveold "..\datasets\stata\lab_store_wra.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\lab_store_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_store_wra.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:10
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_lab_store.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*lab_store*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\lab_store.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_store.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:10
+
+. odbc load,exec("
+> SELECT
+> id,
+> insert_time,
+> inserted_by,
+> update_time,
+> updateed_by,
+> aliquot_id,
+> box_id,
+> cell_number,
+> ltid,
+> sample_type,
+> specimenid,
+> study_type,
+> visit_type
+> FROM [mindr-live].dbo.lab_store
+> ") dsn("rammps");
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\lab_store.dta", replace
+file ..\datasets\stata\lab_store.dta saved
+
+. saveold "..\datasets\stata\lab_store.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\lab_store.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lab_store.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:10
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_lpf_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*lpf*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\lpf_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lpf_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:10
+
+. odbc load,exec("
+> select
+> 
+> lp.uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> /*womname,*/
+> /*husbname,*/
+> idenconf,
+> lpwkint,
+> lpdate,
+> workerid,
+> lpstatus,
+> lpdoc,
+> lpdod,
+> /*secc*/
+> lpcgh30,
+> lpcgh30d,
+> lpcghtx1,
+> lpcghtx2,
+> lpcgh7,
+> lpcgh7n,
+> lpbrth30,
+> lpbrth30d,
+> lpbrthtx1,
+> lpbrthtx2,
+> lpbrth7,
+> lpbrth7n,
+> lpappt30,
+> lpappt30d,
+> lpappttx1,
+> lpappttx2,
+> lpappt7,
+> lpnaus30,
+> lpnaus30d,
+> lpnaustx1,
+> lpnaustx2,
+> lpnaus7,
+> lpvmt30,
+> lpvmt30d,
+> lpvmttx1,
+> lpvmttx2,
+> lpvmt7,
+> lpconv30,
+> lpconv30d,
+> lpconvtx1,
+> lpconvtx2,
+> lpconv7,
+> lpconv7n,
+> lpswlh30,
+> lpswlh30d,
+> lpswlhtx1,
+> lpswlhtx2,
+> lpswlh7,
+> lpswlh7n,
+> lpswlf30,
+> lpswlf30d,
+> lpswlftx1,
+> lpswlftx2,
+> lpswlf7,
+> lpswlf7n,
+> lphach30,
+> lphach30d,
+> lphachtx1,
+> lphachtx2,
+> lphach7,
+> lphach7n,
+> lphfvr30,
+> lphfvr30d,
+> lphfvrtx1,
+> lphfvrtx2,
+> lphfvr7,
+> lphfvr7n,
+> lplfvr30,
+> lplfvr30d,
+> lplfvrtx1,
+> lplfvrtx2,
+> lplfvr7,
+> lpdiar30,
+> lpdiar30d,
+> lpdiartx1,
+> lpdiartx2,
+> lpdiar7,
+> lpdiar7n,
+> lpdys30,
+> lpdys30d,
+> lpdystx1,
+> lpdystx2,
+> lpdys7,
+> lpdys7n,
+> lpwdys30,
+> lpwdys30d,
+> lpwdystx1,
+> lpwdystx2,
+> lpwdys7,
+> lplabd30,
+> lplabd30d,
+> lplabdtx1,
+> lplabdtx2,
+> lplabd7,
+> lplabd7n,
+> lpurin30,
+> lpurin30d,
+> lpurintx1,
+> lpurintx2,
+> lpurin7,
+> lpurin7n,
+> lpvagd30,
+> lpvagd30d,
+> lpvagdtx1,
+> lpvagdtx2,
+> lpvagd7,
+> lpvagd7n,
+> lpspot30,
+> lpspot30d,
+> lpspottx1,
+> lpspottx2,
+> lpspot7,
+> lpspot7n,
+> lpvbld30,
+> lpvbld30d,
+> lpvbldtx1,
+> lpvbldtx2,
+> lpvbld7,
+> lpvbld7n,
+> lpxn30,
+> lpxn30d,
+> lpxntx1,
+> lpxntx2,
+> lpxn7,
+> lpxn7n,
+> /*secf*/
+> lplatrine,
+> lpeathw,
+> lpeathwu,
+> lpeathwn,
+> lpdefhw,
+> lpdefhwu,
+> lpdefhwn,
+> lpbirdhw,
+> lpbirdhwu,
+> lpbirdhwn,
+> lpbcookhw,
+> lpbcookhwu,
+> lpbcookhwn,
+> /*secj*/
+> lpbaperbari,
+> lpbfdelv,
+> lpbfdelvs,
+> lpdelvaddr,
+> /*seeff*/
+> lptab30,
+> lptabphoto30,
+> lptabn30,
+> lptab30o1,
+> /*e4re1*/
+> lptabphoto301,
+> lptabn301,
+> lptab30o2,
+> /*e4re2*/
+> lptabphoto302,
+> lptabn302,
+> lptab30o3,
+> /*e4re3*/
+> lptabphoto303,
+> lptabn303,
+> lptab30o4,
+> /*e4re4*/
+> lptabphoto304,
+> lptabn304,
+> lptab30o5,
+> /*e4re5*/
+> lptabphoto305,
+> lptabn305,
+> /*sece*/
+> version,
+> today,
+> start,
+> [end],
+> scheduleid,
+> /*formorder,*/
+> /*insert_time,*/
+> /*update_time,*/
+> /*inserted_by,*/
+> /*updateed_by,*/
+> lp._submission_time,
+> /*_submitted_by,*/
+> /*_date_modified,*/
+> /*_xform_id,*/
+> instance_id,
+> /*_duration,*/
+> /*_media_all_received,*/
+> /*_media_count,*/
+> _id
+> /*_uuid,*/
+> /*_version,*/
+> /*duplicate*/
+> from [mindr-live].dbo.lpf_mv lp
+> ") dsn("rammps");
+
+. fixdate lpdate lpdoc lpdod;
+(278 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. save "..\datasets\stata\lpf_pw.dta", replace
+file ..\datasets\stata\lpf_pw.dta saved
+
+. saveold "..\datasets\stata\lpf_pw.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\lpf_pw.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lpf_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:10
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_lpfb_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*lpfb_pw*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\lpfb_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lpfb_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:10
+
+. odbc load,exec("
+> select 
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> womname,
+> husbname,
+> idenconf,
+> lpbdate,
+> workerid,
+> lpbstatus,
+> lpbdoc,
+> lpbdod,
+> lpbtemp,
+> lpbtempn1,
+> lpbsysto1,
+> lpbdiast1,
+> lpbbptime1,
+> workerid_bp,
+> lpbweight,
+> lpbmuac1,
+> lpbmuac2,
+> lpbmuac3,
+> lpbsysto2,
+> lpbdiast2,
+> lpbbptime2,
+> lpbbptime2n,
+> workerid_an,
+> lpbmealdate,
+> lpbmealtime,
+> lpbmealtimec,
+> lpbfood,
+> lpbblood1,
+> lpbblood2,
+> lpbspecid1,
+> st,
+> vt,
+> supt,
+> lpbspecid2,
+> st1,
+> vt1,
+> supt1,
+> lpbbldtime,
+> lpbhemo,
+> lpbfetab,
+> workerid_bl,
+> version,
+> today,
+> start,
+> [end],
+> scheduleid,
+> /*insert_time,*/
+> /*update_time,*/
+> /*inserted_by,*/
+> /*updateed_by,*/
+> /*_submission_time,*/
+> /*_submitted_by,*/
+> /*_date_modified,*/
+> /*_xform_id,*/
+> instance_id,
+> /*_duration,*/
+> /*_media_all_received,*/
+> /*_media_count,*/
+> _id
+> /*_uuid,*/
+> /*_version,*/
+> /*duplicate*/
+> from [mindr-live].dbo.lpfb_mv  lpb
+> ") dsn("rammps");
+
+. fixdate lpbdate lpbdoc lpbdod;
+(263 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. destring lpbweight, force replace;
+lpbweight: all characters numeric; replaced as double
+(2 missing values generated)
+
+. destring lpbmuac1, force replace;
+lpbmuac1: all characters numeric; replaced as double
+(2 missing values generated)
+
+. destring lpbmuac2, force replace;
+lpbmuac2: all characters numeric; replaced as double
+(2 missing values generated)
+
+. destring lpbmuac3, force replace;
+lpbmuac3: all characters numeric; replaced as double
+(2 missing values generated)
+
+. save "..\datasets\stata\lpfb_pw.dta", replace ;
+file ..\datasets\stata\lpfb_pw.dta saved
+
+. #delimit cr
+delimiter now cr
+. 
+. foreach v of varlist lpbmuac* {
+  2.         replace `v' = . if (`v' == 00.0 | `v' == 99.9)
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. save "..\datasets\stata\lpfb_pw.dta", replace
+file ..\datasets\stata\lpfb_pw.dta saved
+
+. 
+. gen byte n_missing = (missing(lpbmuac1))+(missing(lpbmuac2))+(missing(lpbmuac
+> 3))
+
+. gen medlpbmuac = lpbmuac1+lpbmuac2+lpbmuac3-min(lpbmuac1, lpbmuac2, lpbmuac3)
+> -max(lpbmuac1, lpbmuac2, lpbmuac3) if n_missing==0
+(2 missing values generated)
+
+. replace medlpbmuac = (min(lpbmuac1, lpbmuac2, lpbmuac3)+max(lpbmuac1, lpbmuac
+> 2, lpbmuac3))/2 if n_missing==1
+(0 real changes made)
+
+. replace medlpbmuac = max(lpbmuac1, lpbmuac2, lpbmuac3) if n_missing==2
+(0 real changes made)
+
+. drop n_missing
+
+. 
+. save "..\datasets\stata\lpfb_pw.dta", replace
+file ..\datasets\stata\lpfb_pw.dta saved
+
+. 
+. foreach v of varlist lpbweight {
+  2.         replace `v' = . if (`v' == 00.0 | `v' == 99.9)
+  3. }
+(0 real changes made)
+
+. 
+. 
+. 
+. save "..\datasets\stata\lpfb_pw.dta", replace
+file ..\datasets\stata\lpfb_pw.dta saved
+
+. saveold "..\datasets\stata\lpfb_pw.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\lpfb_pw.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\lpfb_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:10
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_m1mop_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*mpfb*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\m1mop_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\m1mop_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:10
+
+. odbc load,exec("
+> select 
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> /*hhchange,*/
+> /*newhhid,*/
+> /*womname,*/
+> /*husbname,*/
+> /*idenconf,*/
+> m1date,
+> workerid,
+> m1status,
+> m1dod,
+> m1cgh30,
+> m1cgh30d,
+> m1cghtx1,
+> m1cghtx2,
+> m1cgh7,
+> m1cgh7n,
+> m1brth30,
+> m1brth30d,
+> m1brthtx1,
+> m1brthtx2,
+> m1brth7,
+> m1brth7n,
+> m1conv30,
+> m1conv30d,
+> m1convtx1,
+> m1convtx2,
+> m1conv7,
+> m1conv7n,
+> m1swlh30,
+> m1swlh30d,
+> m1swlhtx1,
+> m1swlhtx2,
+> m1swlh7,
+> m1swlh7n,
+> m1swlf30,
+> m1swlf30d,
+> m1swlftx1,
+> m1swlftx2,
+> m1swlf7,
+> m1swlf7n,
+> m1hach30,
+> m1hach30d,
+> m1hachtx1,
+> m1hachtx2,
+> m1hach7,
+> m1hach7n,
+> m1hfvr30,
+> m1hfvr30d,
+> m1hfvrtx1,
+> m1hfvrtx2,
+> m1hfvr7,
+> m1hfvr7n,
+> m1lfvr30,
+> m1lfvr30d,
+> m1lfvrtx1,
+> m1lfvrtx2,
+> m1lfvr7,
+> m1diar30,
+> m1diar30d,
+> m1diartx1,
+> m1diartx2,
+> m1diar7,
+> m1diar7n,
+> m1dys30,
+> m1dys30d,
+> m1dystx1,
+> m1dystx2,
+> m1dys7,
+> m1dys7n,
+> m1wdys30,
+> m1wdys30d,
+> m1wdystx1,
+> m1wdystx2,
+> m1wdys7,
+> m1labd30,
+> m1labd30d,
+> m1labdtx1,
+> m1labdtx2,
+> m1labd7,
+> m1labd7n,
+> m1urin30,
+> m1urin30d,
+> m1urintx1,
+> m1urintx2,
+> m1urin7,
+> m1urin7n,
+> m1vagd30,
+> m1vagd30d,
+> m1vagdtx1,
+> m1vagdtx2,
+> m1vagd7,
+> m1vagd7n,
+> m1xn30,
+> m1xn30d,
+> m1xntx1,
+> m1xntx2,
+> m1xn7,
+> m1xn7n,
+> m1tab30,
+> m1tabphoto30,
+> m1tabn30,
+> m1tab30o1,
+> m1tabphoto301,
+> m1tabn301,
+> m1tab30o2,
+> m1tabphoto302,
+> m1tabn302,
+> m1tab30o3,
+> m1tabphoto303,
+> m1tabn303,
+> m1tab30o4,
+> m1tabphoto304,
+> m1tabn304,
+> m1tab30o5,
+> m1tabphoto305,
+> m1tabn305,
+> version,
+> today,
+> start,
+> [end],
+> scheduleid,
+> insert_time,
+> update_time,
+> _submission_time,
+> /*_xform_id,*/
+> /*instanceid,*/
+> _id,
+> _uuid,
+> _version
+> from [mindr-live].dbo.m1mop_mv mp
+> ") dsn("rammps");
+
+. fixdate m1date m1dod;
+(292 real changes made)
+(0 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. save "..\datasets\stata\m1mop_pw.dta", replace
+file ..\datasets\stata\m1mop_pw.dta saved
+
+. saveold "..\datasets\stata\m1mop_pw.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\m1mop_pw.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\m1mop_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:12
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_m1mopb_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*mpfb*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\m1mopb_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\m1mopb_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:12
+
+. odbc load,exec("
+> select 
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> /*womname,*/
+> /*husbname,*/
+> idenconf,
+> m1bdate,
+> workerid,
+> m1bstatus,
+> m1bdod,
+> m1btemp,
+> m1btempn1,
+> m1bsysto1,
+> m1bdiast1,
+> m1bbptime1,
+> workerid_bp,
+> m1bweight,
+> m1bmuac1,
+> m1bmuac2,
+> m1bmuac3,
+> m1bsysto2,
+> m1bdiast2,
+> m1bbptime2,
+> m1bbptime2n,
+> workerid_an,
+> m1blastfedt,
+> m1blastfedbu,
+> m1bbrstused,
+> m1bbrstcln,
+> m1bcols,
+> m1bcole,
+> m1bbmilkv,
+> m1bbrstemty,
+> m1bbmspecid,
+> stb,
+> vtb,
+> suptb,
+> workerid_bm,
+> m1bmealdate,
+> m1bmealtime,
+> m1bmealtimec,
+> m1bfood,
+> m1bblood1,
+> m1bblood2,
+> m1bspecid1,
+> st,
+> vt,
+> supt,
+> m1bspecid2,
+> st1,
+> vt1,
+> supt1,
+> m1bbldtime,
+> m1bhemo,
+> m1bfetab,
+> workerid_bl,
+> childvts,
+> version,
+> today,
+> start,
+> [end],
+> scheduleid,
+> /*insert_time,*/
+> /*update_time,*/
+> _submission_time,
+> /*_submitted_by,*/
+> /*_date_modified,*/
+> /*_xform_id,*/
+> /*instanceid,*/
+> /*_duration,*/
+> /*_media_all_received,*/
+> /*_media_count,*/
+> _id
+> /*_uuid,*/
+> /*_version,*/
+> /*duplicate*/
+> from [mindr-live].dbo.m1mopb_mv mp
+> ") dsn("rammps");
+
+. fixdate m1bdate m1bdod m1bmealdate;
+(290 real changes made)
+(0 real changes made)
+(287 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. destring m1bweight, force replace
+m1bweight: all characters numeric; replaced as double
+(3 missing values generated)
+
+. destring m1bmuac1, force replace
+m1bmuac1: all characters numeric; replaced as double
+(3 missing values generated)
+
+. destring m1bmuac2, force replace
+m1bmuac2: all characters numeric; replaced as double
+(3 missing values generated)
+
+. destring m1bmuac3, force replace
+m1bmuac3: all characters numeric; replaced as double
+(3 missing values generated)
+
+. 
+. 
+. save "..\datasets\stata\m1mopb_pw.dta", replace 
+file ..\datasets\stata\m1mopb_pw.dta saved
+
+. 
+. 
+. foreach v of varlist m1bmuac* {
+  2.         replace `v' = . if (`v' == 00.0 | `v' == 99.9)
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. save "..\datasets\stata\m1mopb_pw.dta", replace
+file ..\datasets\stata\m1mopb_pw.dta saved
+
+. 
+. gen byte n_missing = (missing(m1bmuac1))+(missing(m1bmuac2))+(missing(m1bmuac
+> 3))
+
+. gen medm1bmuac = m1bmuac1+m1bmuac2+m1bmuac3-min(m1bmuac1, m1bmuac2, m1bmuac3)
+> -max(m1bmuac1, m1bmuac2, m1bmuac3) if n_missing==0
+(3 missing values generated)
+
+. replace medm1bmuac = (min(m1bmuac1, m1bmuac2, m1bmuac3)+max(m1bmuac1, m1bmuac
+> 2, m1bmuac3))/2 if n_missing==1
+(0 real changes made)
+
+. replace medm1bmuac = max(m1bmuac1, m1bmuac2, m1bmuac3) if n_missing==2
+(0 real changes made)
+
+. drop n_missing
+
+. 
+. save "..\datasets\stata\m1mopb_pw.dta", replace
+file ..\datasets\stata\m1mopb_pw.dta saved
+
+. 
+. foreach v of varlist m1bweight {
+  2.         replace `v' = . if (`v' == 00.0 | `v' == 99.9)
+  3. }
+(0 real changes made)
+
+. 
+. 
+. save "..\datasets\stata\m1mopb_pw.dta", replace
+file ..\datasets\stata\m1mopb_pw.dta saved
+
+. saveold "..\datasets\stata\m1mopb_pw.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\m1mopb_pw.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\m1mopb_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:14
+-------------------------------------------------------------------------------
+
+. 
+. 
+end of do-file
+
+. do generate_mbaf.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*pefb*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\mbaf.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\mbaf.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:14
+
+. odbc load,exec("
+> SELECT
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> /*womname,*/
+> /*husbname,*/
+> mbwkint,
+> mbdate,
+> workerid,
+> mbrelat,
+> mbrelats,
+> mbstatus,
+> mbvital,
+> mbweight,
+> mbsysto1,
+> mbdiast1,
+> mbbptime1,
+> mblbn,
+> mbsbn,
+> mb1sex,
+> mb1pof,
+> mb1stk,
+> mb1wrap,
+> mb1fresh,
+> mb1def,
+> mb2sex,
+> mb2pof,
+> mb2stk,
+> mb2wrap,
+> mb2fresh,
+> mb2def,
+> mb3sex,
+> mb3pof,
+> mb3stk,
+> mb3wrap,
+> mb3fresh,
+> mb3def,
+> mbtype,
+> mbtypes,
+> mbcsecres,
+> mbcsecrec,
+> mbwhr,
+> mbwhrs,
+> mbwho,
+> mbwhos,
+> mblaborp,
+> mbwhtl1,
+> mbwhtl2,
+> mbwhtl3,
+> mbbabyown,
+> mabomass,
+> mbbohand,
+> mbbovmt,
+> mbbosal,
+> mbbosalij,
+> mbboij,
+> mbbodoc,
+> mbboforc,
+> mbbovac,
+> mbboepis,
+> mbbocsec,
+> mbplown,
+> mbplmass,
+> mbplhand,
+> mbplvmt,
+> mbpldoc,
+> mbplhosp,
+> mbploth,
+> mbenpl,
+> mbbleed,
+> mbsysto2,
+> mbdiast2,
+> mbbptime2,
+> version,
+> today,
+> start,
+> [end],
+> scheduleid,
+> idenconf,
+> /*insert_time,*/
+> /*update_time,*/
+> /*inserted_by,*/
+> /*updateed_by,*/
+> _submission_time,
+> /*_submitted_by,*/
+> /*_date_modified,*/
+> /*_xform_id,*/
+> /*instance_id,*/
+> /*_duration,*/
+> /*_media_all_received,*/
+> /*_media_count,*/
+> _id
+> /*_uuid,*/
+> /*_version,*/
+> /*duplicate,*/
+> FROM [mindr-live].dbo.mbaf_mv
+> ") dsn("rammps");
+
+. fixdate mbdate;
+(293 real changes made)
+
+. destring mbweight, force replace;
+mbweight: all characters numeric; replaced as double
+(34 missing values generated)
+
+. #delimit cr
+delimiter now cr
+. 
+. foreach v of varlist mbweight {
+  2.         replace `v' = . if (`v' == 00.0 | `v' == 99.9)
+  3. }
+(9 real changes made, 9 to missing)
+
+. 
+. 
+. save "..\datasets\stata\mbaf.dta", replace
+file ..\datasets\stata\mbaf.dta saved
+
+. saveold "..\datasets\stata\mbaf.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\mbaf.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\mbaf.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:14
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_mpf_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*mpf_pw*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\mpf_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\mpf_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:14
+
+. odbc load,exec("
+> select
+> mp.uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> womname,
+> husbname,
+> mpwkint,
+> mpdate,
+> workerid,
+> mpstatus,
+> mpdoc,
+> mpdod,
+> /*secc*/
+> mpcgh30,
+> mpcgh30d,
+> mpcghtx1,
+> mpcghtx2,
+> mpcgh7,
+> mpcgh7n,
+> mpbrth30,
+> mpbrth30d,
+> mpbrthtx1,
+> mpbrthtx2,
+> mpbrth7,
+> mpbrth7n,
+> mpappt30,
+> mpappt30d,
+> mpappttx1,
+> mpappttx2,
+> mpappt7,
+> mpnaus30,
+> mpnaus30d,
+> mpnaustx1,
+> mpnaustx2,
+> mpnaus7,
+> mpvmt30,
+> mpvmt30d,
+> mpvmttx1,
+> mpvmttx2,
+> mpvmt7,
+> mpconv30,
+> mpconv30d,
+> mpconvtx1,
+> mpconvtx2,
+> mpconv7,
+> mpconv7n,
+> mpswlh30,
+> mpswlh30d,
+> mpswlhtx1,
+> mpswlhtx2,
+> mpswlh7,
+> mpswlh7n,
+> mpswlf30,
+> mpswlf30d,
+> mpswlftx1,
+> mpswlftx2,
+> mpswlf7,
+> mpswlf7n,
+> mphach30,
+> mphach30d,
+> mphachtx1,
+> mphachtx2,
+> mphach7,
+> mphach7n,
+> mphfvr30,
+> mphfvr30d,
+> mphfvrtx1,
+> mphfvrtx2,
+> mphfvr7,
+> mphfvr7n,
+> mplfvr30,
+> mplfvr30d,
+> mplfvrtx1,
+> mplfvrtx2,
+> mplfvr7,
+> mpdiar30,
+> mpdiar30d,
+> mpdiartx1,
+> mpdiartx2,
+> mpdiar7,
+> mpdiar7n,
+> mpdys30,
+> mpdys30d,
+> mpdystx1,
+> mpdystx2,
+> mpdys7,
+> mpdys7n,
+> mpwdys30,
+> mpwdys30d,
+> mpwdystx1,
+> mpwdystx2,
+> mpwdys7,
+> mplabd30,
+> mplabd30d,
+> mplabdtx1,
+> mplabdtx2,
+> mplabd7,
+> mplabd7n,
+> mpurin30,
+> mpurin30d,
+> mpurintx1,
+> mpurintx2,
+> mpurin7,
+> mpurin7n,
+> mpvagd30,
+> mpvagd30d,
+> mpvagdtx1,
+> mpvagdtx2,
+> mpvagd7,
+> mpvagd7n,
+> mpspot30,
+> mpspot30d,
+> mpspottx1,
+> mpspottx2,
+> mpspot7,
+> mpspot7n,
+> mpvbld30,
+> mpvbld30d,
+> mpvbldtx1,
+> mpvbldtx2,
+> mpvbld7,
+> mpvbld7n,
+> mpxn30,
+> mpxn30d,
+> mpxntx1,
+> mpxntx2,
+> mpxn7,
+> mpxn7n,
+> /*secd*/
+> version,
+> today,
+> start,
+> [end],
+> scheduleid,
+> submm,
+> subyy,
+> todaymmyy,
+> idenconf,
+> insert_time,
+> update_time,
+> inserted_by,
+> updateed_by,
+> mp._submission_time,
+> _submitted_by,
+> _date_modified,
+> _xform_id,
+> instance_id,
+> _duration,
+> _media_all_received,
+> _media_count,
+> _id,
+> _uuid,
+> _version,
+> duplicate
+> from [mindr-live].dbo.mpf_mv mp
+> ") dsn("rammps");
+
+. fixdate mpdate;
+(278 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. save "..\datasets\stata\mpf_pw.dta", replace
+file ..\datasets\stata\mpf_pw.dta saved
+
+. saveold "..\datasets\stata\mpf_pw.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\mpf_pw.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\mpf_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:14
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_mpfb_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*mpfb*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\mpfb_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\mpfb_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:14
+
+. odbc load,exec("
+> select 
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> /*womname,*/
+> /*husbname,*/
+> idenconf,
+> mpbwkint,
+> mpbdate,
+> workerid,
+> mpbstatus,
+> mpbdoc,
+> mpbdod,
+> mpbtemp,
+> mpbtempn1,
+> mpbsysto1,
+> mpbdiast1,
+> mpbbptime1,
+> workerid_bp,
+> mpbweight,
+> mpbmuac1,
+> mpbmuac2,
+> mpbmuac3,
+> mpbsysto2,
+> mpbdiast2,
+> mpbbptime2,
+> mpbbptime1n,
+> workerid_an,
+> mpbmealdate,
+> mpbmealtime,
+> mpbmealtimec,
+> mpbfood,
+> mpbblood1,
+> mpbblood2,
+> mpbspecid1,
+> st,
+> vt,
+> supt,
+> mpbspecid2,
+> st1,
+> vt1,
+> supt1,
+> mpbbldtime,
+> mpbhemo,
+> mpbfetab,
+> workerid_bl,
+> version,
+> today,
+> start,
+> [end],
+> scheduleid,
+> /*insert_time,*/
+> /*update_time,*/
+> /*_submission_time,*/
+> /*_submitted_by,*/
+> /*_date_modified,*/
+> /*_xform_id,*/
+> instanceid,
+> /*_duration,*/
+> /*_media_all_received,*/
+> /*_media_count,*/
+> _id
+> /*_uuid,*/
+> /*_version,*/
+> /*duplicate*/
+> from [mindr-live].dbo.mpfb_mv mp
+> ") dsn("rammps");
+
+. fixdate mpbdate mpbdoc mpbdod;
+(272 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. destring mpbweight, force replace;
+mpbweight: all characters numeric; replaced as double
+(3 missing values generated)
+
+. destring mpbmuac1, force replace;
+mpbmuac1: all characters numeric; replaced as double
+(3 missing values generated)
+
+. destring mpbmuac2, force replace;
+mpbmuac2: all characters numeric; replaced as double
+(3 missing values generated)
+
+. destring mpbmuac3, force replace;
+mpbmuac3: all characters numeric; replaced as double
+(3 missing values generated)
+
+. save "..\datasets\stata\mpfb_pw.dta", replace ;
+file ..\datasets\stata\mpfb_pw.dta saved
+
+. #delimit cr
+delimiter now cr
+. 
+. foreach v of varlist mpbmuac* {
+  2.         replace `v' = . if (`v' == 00.0 | `v' == 99.9)
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. save "..\datasets\stata\mpfb_pw.dta", replace
+file ..\datasets\stata\mpfb_pw.dta saved
+
+. 
+. gen byte n_missing = (missing(mpbmuac1))+(missing(mpbmuac2))+(missing(mpbmuac
+> 3))
+
+. gen medmpbmuac = mpbmuac1+mpbmuac2+mpbmuac3-min(mpbmuac1, mpbmuac2, mpbmuac3)
+> -max(mpbmuac1, mpbmuac2, mpbmuac3) if n_missing==0
+(3 missing values generated)
+
+. replace medmpbmuac = (min(mpbmuac1, mpbmuac2, mpbmuac3)+max(mpbmuac1, mpbmuac
+> 2, mpbmuac3))/2 if n_missing==1
+(0 real changes made)
+
+. replace medmpbmuac = max(mpbmuac1, mpbmuac2, mpbmuac3) if n_missing==2
+(0 real changes made)
+
+. drop n_missing
+
+. 
+. save "..\datasets\stata\mpfb_pw.dta", replace
+file ..\datasets\stata\mpfb_pw.dta saved
+
+. 
+. foreach v of varlist mpbweight {
+  2.         replace `v' = . if (`v' == 00.0 | `v' == 99.9)
+  3. }
+(0 real changes made)
+
+. 
+. 
+. 
+. save "..\datasets\stata\mpfb_pw.dta", replace
+file ..\datasets\stata\mpfb_pw.dta saved
+
+. saveold "..\datasets\stata\mpfb_pw.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\mpfb_pw.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\mpfb_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:16
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_nwef.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*nwef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\nwef.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\nwef.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:16
+
+. odbc load,exec("
+> select 
+> /*from ona form should be correct order ish*/
+> /*from nwef table */
+> nuid as uid,
+> euid,
+> pwuid,
+> tlpin,
+> sector,
+> hhid,
+> /*womname,*/
+> /*husbname,*/
+> jw.jivitaweek as nwewkint,
+> convert(smalldatetime,nwedate,121) as nwedate,
+> workerid,
+> nwestatus,
+> wef_consent as nwef_consent,
+> wef_fconsent as nwef_fconsent,
+> wef_dconsent as nwef_dconsent,
+> nwejivita,
+> nwejivitamc,
+> nwejivitacap,
+> nwejivitakcap,
+> nwejivitamob,
+> nwehhmerr,
+> wsts1,
+> nwewsts,
+> wsts,
+> subyy,
+> submm,
+> subdd,
+> nwedobdd,
+> nwedobmm,
+> nwedobyy,
+> nwedobdate,
+> nwedobmmc,
+> nwedobddc,
+> agecal1,
+> agemm,
+> agedd,
+> agecal,
+> wemarrlhus as nwemarrlhus,
+> /*nwemarrydatedd,<-- missing */
+> /*nwemarrydatemm,<-- missing */
+> /*nwemarrydateyy,<-- missing */
+> /*nwemarrydateddbc,<-- missing */
+> /*nwehusage,<-- missing */
+> wecurpreg as nwecurpreg,
+> welmpddc as nwelmpddc,
+> welmpmm as nwelmpmm,
+> welmpyy as nwelmpyy,
+> welmpdd as nwelmpdd,
+> welmp as nwelmp,
+> lmp_display,
+> lmp_displayt,
+> lmp_displayt1,
+> weurt as nweurt,
+> weinft as nweinft,
+> wecurbfd as nwecurbfd,
+> wewant6m as nwewant6m,
+> wefpm as nwefpm,
+> wefpt as nwefpt,
+> wef_pw_consent as nwef_pw_consent,
+> welrins as nwelrins,
+> nweownmob,
+> nwemobno,
+> nwecont,
+> nwecontno,
+> nwecontown,
+> surt,
+> surtc,
+> version,
+> today,
+> start,
+> [end],
+> scheduleid,
+> pwcon,
+> /*dmc <-- missing */
+> /*pwuid,*/
+> duplicate,
+> _date_modified,
+> _duration,
+> _media_all_received,
+> _media_count,
+> _id,
+> _uuid,
+> _version,
+> _submission_time,
+> _submitted_by,
+> _total_media,
+> _xform_id,
+> id,
+> insert_time,
+> update_time
+> from [mindr-live].dbo.all_nwef
+> join shapla.dbo.JiVitAWeek jw on jw.RomanDate = convert(smalldatetime,nwedate
+> ,121)
+> where duplicate is null
+> 
+> 
+> ") dsn("rammps");
+
+. fixdate nwedate;
+(1,269 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\nwef.dta", replace
+file ..\datasets\stata\nwef.dta saved
+
+. saveold "..\datasets\stata\nwef.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\nwef.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\nwef.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:16
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_pef_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*pef_pw*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\pef_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\pef_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:16
+
+. odbc load,exec("
+> select
+> uid,
+> submm,
+> subyy,
+> todaymmyy,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> pewkint,
+> pedate,
+> idenconf,
+> workerid,
+> pestatus,
+> pe_consent,
+> pe_fconsent,
+> pe_dconsent,
+> conread,
+> surlev,
+> conspec,
+> specana,
+> surbenfit,
+> infocon,
+> futuse,
+> futstudy,
+> futcont,
+> recacess,
+> stucons,
+> pewantpr,
+> pehwantpr,
+> peprvprn,
+> peprvpra,
+> pep1mm,
+> pep1yy,
+> pep1mmyy,
+> pep1outc,
+> pep1kids,
+> pep1sex,
+> pep1vit,
+> pep1sex1,
+> pep1vit1,
+> pep1sex2,
+> pep1vit2,
+> pep1sex3,
+> pep1vit3,
+> pep2mm,
+> pep2yy,
+> pep2mmyy,
+> pep2outc,
+> pep2kids,
+> pep2sex,
+> pep2vit,
+> pep2sex1,
+> pep2vit1,
+> pep2sex2,
+> pep2vit2,
+> pep2sex3,
+> pep2vit3,
+> pep3mm,
+> pep3yy,
+> pep3mmyy,
+> pep3outc,
+> pep3kids,
+> pep3sex,
+> pep3vit,
+> pep3sex1,
+> pep3vit1,
+> pep3sex2,
+> pep3vit2,
+> pep3sex3,
+> pep3vit3,
+> pep4mm,
+> pep4yy,
+> pep4mmyy,
+> pep4outc,
+> pep4kids,
+> pep4sex,
+> pep4vit,
+> pep4sex1,
+> pep4vit1,
+> pep4sex2,
+> pep4vit2,
+> pep4sex3,
+> pep4vit3,
+> pep5mm,
+> pep5yy,
+> pep5mmyy,
+> pep5outc,
+> pep5kids,
+> pep5sex,
+> pep5vit,
+> pep5sex1,
+> pep5vit1,
+> pep5sex2,
+> pep5vit2,
+> pep5sex3,
+> pep5vit3,
+> pep6mm,
+> pep6yy,
+> pep6mmyy,
+> pep6outc,
+> pep6kids,
+> pep6sex,
+> pep6vit,
+> pep6sex1,
+> pep6vit1,
+> pep6sex2,
+> pep6vit2,
+> pep6sex3,
+> pep6vit3,
+> pep7mm,
+> pep7yy,
+> pep7mmyy,
+> pep7outc,
+> pep7kids,
+> pep7sex,
+> pep7vit,
+> pep7sex1,
+> pep7vit1,
+> pep7sex2,
+> pep7vit2,
+> pep7sex3,
+> pep7vit3,
+> pep8mm,
+> pep8yy,
+> pep8mmyy,
+> pep8outc,
+> pep8kids,
+> pep8sex,
+> pep8vit,
+> pep8sex1,
+> pep8vit1,
+> pep8sex2,
+> pep8vit2,
+> pep8sex3,
+> pep8vit3,
+> pep9mm,
+> pep9yy,
+> pep9mmyy,
+> pep9outc,
+> pep9kids,
+> pep9sex,
+> pep9vit,
+> pep9sex1,
+> pep9vit1,
+> pep9sex2,
+> pep9vit2,
+> pep9sex3,
+> pep9vit3,
+> pep10mm,
+> pep10yy,
+> pep10mmyy,
+> pep10outc,
+> pep10kids,
+> pep10sex,
+> pep10vit,
+> pep10sex1,
+> pep10vit1,
+> pep10sex2,
+> pep10vit2,
+> pep10sex3,
+> pep10vit3,
+> pep11mm,
+> pep11yy,
+> pep11mmyy,
+> pep11outc,
+> pep11kids,
+> pep11sex,
+> pep11vit,
+> pep11sex1,
+> pep11vit1,
+> pep11sex2,
+> pep11vit2,
+> pep11sex3,
+> pep11vit3,
+> pep12mm,
+> pep12yy,
+> pep12mmyy,
+> pep12outc,
+> pep12kids,
+> pep12sex,
+> pep12vit,
+> pep12sex1,
+> pep12vit1,
+> pep12sex2,
+> pep12vit2,
+> pep12sex3,
+> pep12vit3,
+> pemnsalp,
+> pebrstfd,
+> pecgh30,
+> pecgh30d,
+> pecghtx1,
+> pecghtx2,
+> pecgh7,
+> pecgh7n,
+> pebrth30,
+> pebrth30d,
+> pebrthtx1,
+> pebrthtx2,
+> pebrth7,
+> pebrth7n,
+> peappt30,
+> peappt30d,
+> peappttx1,
+> peappttx2,
+> peappt7,
+> penaus30,
+> penaus30d,
+> penaustx1,
+> penaustx2,
+> penaus7,
+> pevmt30,
+> pevmt30d,
+> pevmttx1,
+> pevmttx2,
+> pevmt7,
+> peconv30,
+> peconv30d,
+> peconvtx1,
+> peconvtx2,
+> peconv7,
+> peconv7n,
+> peswlh30,
+> peswlh30d,
+> peswlhtx1,
+> peswlhtx2,
+> peswlh7,
+> peswlh7n,
+> peswlf30,
+> peswlf30d,
+> peswlftx1,
+> peswlftx2,
+> peswlf7,
+> peswlf7n,
+> pehach30,
+> pehach30d,
+> pehachtx1,
+> pehachtx2,
+> pehach7,
+> pehach7n,
+> pehfvr30,
+> pehfvr30d,
+> pehfvrtx1,
+> pehfvrtx2,
+> pehfvr7,
+> pehfvr7n,
+> pelfvr30,
+> pelfvr30d,
+> pelfvrtx1,
+> pelfvrtx2,
+> pelfvr7,
+> pediar30,
+> pediar30d,
+> pediartx1,
+> pediartx2,
+> pediar7,
+> pediar7n,
+> pedys30,
+> pedys30d,
+> pedystx1,
+> pedystx2,
+> pedys7,
+> pedys7n,
+> pewdys30,
+> pewdys30d,
+> pewdystx1,
+> pewdystx2,
+> pewdys7,
+> pelabd30,
+> pelabd30d,
+> pelabdtx1,
+> pelabdtx2,
+> pelabd7,
+> pelabd7n,
+> peurin30,
+> peurin30d,
+> peurintx1,
+> peurintx2,
+> peurin7,
+> peurin7n,
+> pevagd30,
+> pevagd30d,
+> pevagdtx1,
+> pevagdtx2,
+> pevagd7,
+> pevagd7n,
+> pespot30,
+> pespot30d,
+> pespottx1,
+> pespottx2,
+> pespot7,
+> pespot7n,
+> pevbld30,
+> pevbld30d,
+> pevbldtx1,
+> pevbldtx2,
+> pevbld7,
+> pevbld7n,
+> pexn30,
+> pexn30d,
+> pexntx1,
+> pexntx2,
+> pexn7,
+> pexn7n,
+> pelatrine,
+> peeathw,
+> peeathwu,
+> peeathwn,
+> pedefhw,
+> pedefhwu,
+> pedefhwn,
+> pebirdhw,
+> pebirdhwu,
+> pebirdhwn,
+> pebcookhw,
+> pebcookhwu,
+> pebcookhwn,
+> petab30,
+> petabphoto30,
+> petabn30,
+> petab30o1,
+> petabphoto301,
+> petabn301,
+> petab30o2,
+> petabphoto302,
+> petabn302,
+> petab30o3,
+> petabphoto303,
+> petabn303,
+> petab30o4,
+> petabphoto304,
+> petabn304,
+> petab30o5,
+> petabphoto305,
+> petabn305,
+> version,
+> today,
+> start,
+> scheduleid
+> from     [mindr-live].dbo.pef_mv
+> ") dsn("rammps");
+
+. fixdate pedate;
+(418 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\pef_pw.dta", replace
+file ..\datasets\stata\pef_pw.dta saved
+
+. saveold "..\datasets\stata\pef_pw.dta",replace version(12)  /*restored 2024.0
+> 6.10  removed 2024.05.14  */
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\pef_pw.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\pef_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:16
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_pefb_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*pefb_pw*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\pefb_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\pefb_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:16
+
+. odbc load,exec("
+> select 
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> /*hhchange,*/
+> /*newhhid,*/
+> pebwkint,
+> pebdate,
+> /*
+> womname,
+> husbname,
+> */
+> idenconf,
+> workerid,
+> pebstatus,
+> pebdoc,
+> pebdod,
+> pebtemp,
+> pebtempn1,
+> pebsysto1,
+> pebdiast1,
+> pebbptime1,
+> workerid_bp,
+> pebweight,
+> pebheight1,
+> pebheight2,
+> pebheight3,
+> pebmuac1,
+> pebmuac2,
+> pebmuac3,
+> pebsysto2,
+> pebdiast2,
+> pebbptime2,
+> workerid_an,
+> pebmealdate,
+> pebmealtime,
+> pebmealtimec,
+> pebfood,
+> pebblood1,
+> pebblood2,
+> pebspecid1,
+> st,
+> vt,
+> supt,
+> pebspecid2,
+> st1,
+> vt1,
+> supt1,
+> pebbldtime,
+> pebhemo,
+> pebfetab,
+> pebbltype,
+> pebrhtype,
+> workerid_bl,
+> version,
+> today,
+> start,
+> [end],
+> scheduleid
+> FROM [mindr-live].dbo.pefb_mv") dsn("rammps");
+
+. fixdate pebdate pebdoc pebdod;
+(342 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. destring pebweight, force replace;
+pebweight: all characters numeric; replaced as double
+(5 missing values generated)
+
+. destring pebmuac1, force replace;
+pebmuac1: all characters numeric; replaced as double
+(5 missing values generated)
+
+. destring pebmuac2, force replace;
+pebmuac2: all characters numeric; replaced as double
+(5 missing values generated)
+
+. destring pebmuac3, force replace;
+pebmuac3: all characters numeric; replaced as double
+(5 missing values generated)
+
+. destring pebheight1, force replace;
+pebheight1: all characters numeric; replaced as double
+(5 missing values generated)
+
+. destring pebheight2, force replace;
+pebheight2: all characters numeric; replaced as double
+(5 missing values generated)
+
+. destring pebheight3, force replace;
+pebheight3: all characters numeric; replaced as double
+(5 missing values generated)
+
+. save "..\datasets\stata\pefb_pw.dta", replace ;
+file ..\datasets\stata\pefb_pw.dta saved
+
+. #delimit cr
+delimiter now cr
+. 
+. foreach v of varlist pebmuac* {
+  2.         replace `v' = . if (`v' == 00.0 | `v' == 99.9)
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. save "..\datasets\stata\pefb_pw.dta", replace
+file ..\datasets\stata\pefb_pw.dta saved
+
+. 
+. gen byte n_missing = (missing(pebmuac1))+(missing(pebmuac2))+(missing(pebmuac
+> 3))
+
+. gen medpebmuac = pebmuac1+pebmuac2+pebmuac3-min(pebmuac1, pebmuac2, pebmuac3)
+> -max(pebmuac1, pebmuac2, pebmuac3) if n_missing==0
+(5 missing values generated)
+
+. replace medpebmuac = (min(pebmuac1, pebmuac2, pebmuac3)+max(pebmuac1, pebmuac
+> 2, pebmuac3))/2 if n_missing==1
+(0 real changes made)
+
+. replace medpebmuac = max(pebmuac1, pebmuac2, pebmuac3) if n_missing==2
+(0 real changes made)
+
+. drop n_missing
+
+. 
+. save "..\datasets\stata\pefb_pw.dta", replace
+file ..\datasets\stata\pefb_pw.dta saved
+
+. 
+. foreach v of varlist pebheight* {
+  2.         replace `v' = . if (`v' == 00.0 | `v' == 99.9)
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. gen byte n_missing = (missing(pebheight1))+(missing(pebheight2))+(missing(peb
+> height3))
+
+. gen medpebheight = pebheight1+pebheight2+pebheight3-min(pebheight1, pebheight
+> 2, pebheight3)-max(pebheight1, pebheight2, pebheight3) if n_missing==0
+(5 missing values generated)
+
+. replace medpebheight = (min(pebheight1, pebheight2, pebheight3)+max(pebheight
+> 1, pebheight2, pebheight3))/2 if n_missing==1
+(0 real changes made)
+
+. replace medpebheight = max(pebheight1, pebheight2, pebheight3) if n_missing==
+> 2
+(0 real changes made)
+
+. drop n_missing
+
+. 
+. 
+. foreach v of varlist pebweight {
+  2.         replace `v' = . if (`v' == 00.0 | `v' == 99.9)
+  3. }
+(0 real changes made)
+
+. 
+. 
+. 
+. save "..\datasets\stata\pefb_pw.dta", replace
+file ..\datasets\stata\pefb_pw.dta saved
+
+. saveold "..\datasets\stata\pefb_pw.dta",replace version(12) /* restored 2024.
+> 06.10   removed 2024.05.14  */
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\pefb_pw.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\pefb_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:17
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_pregtrak.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*pregtrak*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\pregtrak.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\pregtrak.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:17
+
+. odbc load,exec("SELECT
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> /*woman_status,*/
+> bgdob as wom_dob,
+> /*age,*/
+> age_pef,
+> age_wef,
+> allocated_arm as arm_pw,
+> /*age_grp,*/
+> /*dobyy,*/
+> /*dobdd,*/
+> /*dobmm,*/
+> /*convert(smalldatetime,dod,121) as wom_dod, -- ez said no deaths is this tru
+> e ?  - create a dod var to catch these*/ 
+> /*pef_eligable,*/
+> /*pef_eligible,*/
+> /*pef_status,*/
+> peconsent as pef_consent,
+> pedate as pef_date,
+> pefstatus as pef_status,
+> /*convert(smalldatetime,pef_done_date,121) as pef_done_date,*/
+> /*pef_consent,*/
+> /*convert(smalldatetime,pefb_done_date,121) as pefb_date,*/
+> /*pefb_status,*/
+> peb_date,
+> peb_time,
+> peb_meal_time,
+> peb_fast_time ,
+> peb_status,
+> /*psfstatus as psf_status,*/
+> /*psf_date,*/
+> /*last_psf_status,*/
+> /*last_psf_date,*/
+> /*psfurt,*/
+> psfurt_date as urtpos_psf,
+> /*ga_at_psfurt as ga_psf,*/
+> /*psflmp as lmp_psf, -- excluded 20250604*/
+> /*convert(smalldatetime,psf_done_date,121) as psf_done_date,*/
+> /*psf_eligable,*/
+> /*convert(smalldatetime,psf_lmp_date,121) as psf_lmp_date,*/
+> /*psf_status,*/
+> /*psf_urt,*/
+> /*convert(smalldatetime,saf_done_date,121) as saf_done_date,*/
+> /*saf_past_order,*/
+> /*saf_status,*/
+> /*safdate,*/
+> /*last_safstatus,*/
+> /*convert(smalldatetime,last_safdate,121) as saf_date,*/
+> /*safstatus as saf_status,*/
+> /*uvf_done_date as uvf_date,*/
+> /* excluded these 20250604 below*/
+> /*uvf_status,*/
+> /*uvf_ga,*/
+> /*uvf_lmp_date,*/
+> /*lmp_us,*/
+> /*ga_us,*/
+> bglmp,
+> bglmpru,
+> /*bgga_dy,*/
+> bgga,
+> bgoutc as outc,
+> /*bgoutcru as outcru,*/
+> bgoutcsrc as outcsrc,
+> /*bgwoutc as woutc,*/
+> bgdoutc as outcd,
+> parity,
+> gravidity,
+> lsi,
+> /*supp_status,*/
+> saf_flow_status as ever_supp,
+> /*convert(smalldatetime,ses_done_date,121) as ses_date,*/
+> /*ses_status,*/
+> convert(smalldatetime,mpf_done_date,121) as mp_date,
+> mpf_status as mp_status,
+> mpb_date,
+> mpb_time,
+> mpb_meal_time,
+> mpb_fast_time,
+> mpb_status,
+> mid_preg_status,
+> lpfdate as lp_date,
+> lpfstatus as lp_status,
+> lpb_date,
+> lpb_time,
+> lpb_meal_time,
+> lpb_fast_time,
+> lpb_status,
+> late_preg_status,
+> bnfdate as bnf_date,
+> /*convert(smalldatetime,bnf_done_date,121) as bnf_date,*/
+> /*bnf_status,*/
+> /*bnfstatus,*/
+> /*convert(smalldatetime,fbaf_done_date,121) as fbaf_date,*/
+> /*fbaf_status,*/
+> /*convert(smalldatetime,ibaf_done_date,121) as ibaf_date,*/
+> /*ibaf_status,*/
+> /*convert(smalldatetime,mbaf_done_date,121) as mbaf_date,*/
+> /*mbaf_status,*/
+> mbafdate as mbaf_date ,
+> mbafstatus as mbaf_status,
+> /*convert(smalldatetime,i1mop_done_date,121) as i1mop_date,*/
+> /*i1mop_status,*/
+> convert(smalldatetime,m1mop_done_date,121) as m1mop_date,
+> m1mop_status,
+> m1b_date,
+> m1b_time,
+> m1b_meal_time,
+> m1b_fast_time,
+> m1b_status
+> /*convert(smalldatetime,mopb_done_date,121) as mopb_date,*/
+> /*mopb_status,*/
+> /*convert(smalldatetime,outcome_date,121) as outcome_date,*/
+> /*outcome_status,*/
+> /*mpf_ga,*/
+> /*lmp_status,*/
+> /*chld1vitsts,*/
+> /*chld2vitsts,*/
+> /*chld3vitsts,*/
+> /*bgdoutcru as doutcru*/
+> /*fdose_date,*/
+> /*edose_date,*/
+> /*totdose_days,*/
+> /*totdose_mns,*/
+> /*totdose_bep,*/
+> /*pcomp_mns,*/
+> /*pcomp_bep*/
+> FROM [mindr-live].dbo.wtrak_pw") dsn("rammps");
+
+. fixdate wom_dob bnf_date lp_date lpb_date m1mop_date mp_date mpb_date pef_dat
+> e peb_date  urtpos_psf mbaf_date outcd m1b_date bglmp;
+(3,999 real changes made)
+(294 real changes made)
+(278 real changes made)
+(263 real changes made)
+(292 real changes made)
+(278 real changes made)
+(272 real changes made)
+(418 real changes made)
+(342 real changes made)
+(661 real changes made)
+(293 real changes made)
+(300 real changes made)
+(290 real changes made)
+(354 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\pregtrak.dta", replace
+file ..\datasets\stata\pregtrak.dta saved
+
+. saveold "..\datasets\stata\pregtrak.dta",replace version(12) 
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\pregtrak.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\pregtrak.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:17
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_psf.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*psf*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\psf.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\psf.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:17
+
+. odbc load,exec("
+> select
+> p.id,
+> p.uid,
+> p.tlpin,
+> p.sector,
+> p.hhid,
+> jw.jivitaweek as psfwkint,
+> convert(smalldatetime,p.psfdate,121) as psfdate,
+> hhchange,
+> newhhid,
+> /*womname,*/
+> /*husbname,*/
+> workerid,
+> psstatus,
+> subyy,
+> pslmpddc,
+> pslmpmm,
+> pslmpyy,
+> pslmpdd,
+> pslmp,
+> lmp_display,
+> lmp_displayt,
+> lmp_displayt1,
+> psurt,
+> version,
+> today,
+> start,
+> [end],
+> scheduleid,
+> idenconf,
+> p.insert_time,
+> p.update_time,
+> _submission_time,
+> _submitted_by,
+> _date_modified,
+> _xform_id,
+> instanceid,
+> _duration,
+> _media_all_received,
+> _media_count,
+> _id,
+> _uuid,
+> _version,
+> duplicate
+> from [mindr-live].dbo.all_psf p 
+> join shapla.dbo.JiVitAWeek jw on jw.RomanDate = convert(smalldatetime,psfdate
+> ,121)
+> left join [mindr-live].dbo.schedule_pw s on s.id = p.scheduleid
+> where duplicate is null
+> order by p.uid asc 
+> ") dsn("rammps");
+
+. fixdate psfdate;
+(26,301 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. save "..\datasets\stata\psf.dta", replace
+file ..\datasets\stata\psf.dta saved
+
+. saveold "..\datasets\stata\psf.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\psf.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\psf.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:18
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_px_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*px_wra*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\px_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\px_wra.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:18
+
+. odbc load,exec("
+> 
+> select
+> px.[uid],
+> convert(smalldatetime,[date],121) as px_date,
+> jivitaweek,
+> specimentid,
+> glucose,
+> blood_urea_nitrogen,
+> calcium,
+> creatinine,
+> sodium,
+> potassium,
+> chloride,
+> total_carbon_dioxide,
+> bmp_hemolysis,
+> bmp_icterus,
+> bmp_lipemia_,
+> chol,
+> hdl,
+> trig,
+> alt,
+> ast,
+> /*[ast/alt],*/
+> glu,
+> nhdlc,
+> tc_h,
+> ldl,
+> vldl,
+> lp_hemolysis,
+> lp_icterus,
+> lp_lipemia_,
+> visit_type,
+> trial
+> from [mindr-live].dbo.px_data px 
+> inner join [mindr-live].dbo.wtrak_wra wtw on wtw.uid = px.uid 
+> ") dsn("rammps");
+
+. fixdate px_date;
+(771 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\px_wra.dta", replace
+file ..\datasets\stata\px_wra.dta saved
+
+. saveold "..\datasets\stata\px_wra.dta",replace version(12)  
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\px_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\px_wra.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:20
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_px_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*px_pw*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\px_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\px_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:20
+
+. odbc load,exec("
+> select
+> px.[uid],
+> convert(smalldatetime,[date],121) as px_date,
+> jivitaweek,
+> specimentid,
+> glucose,
+> blood_urea_nitrogen,
+> calcium,
+> creatinine,
+> sodium,
+> potassium,
+> chloride,
+> total_carbon_dioxide,
+> bmp_hemolysis,
+> bmp_icterus,
+> bmp_lipemia_,
+> chol,
+> hdl,
+> trig,
+> alt,
+> ast,
+> /*[ast/alt],*/
+> glu,
+> nhdlc,
+> tc_h,
+> ldl,
+> vldl,
+> lp_hemolysis,
+> lp_icterus,
+> lp_lipemia_,
+> visit_type,
+> trial
+> from [mindr-live].dbo.px_data px 
+> inner join [mindr-live].dbo.wtrak_pw wtp on wtp.uid = px.uid 
+> ") dsn("rammps");
+
+. fixdate px_date;
+(1,134 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\px_pw.dta", replace
+file ..\datasets\stata\px_pw.dta saved
+
+. saveold "..\datasets\stata\px_pw.dta",replace version(12)  
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\px_pw.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\px_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:21
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_saf_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\saf_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\saf_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:21
+
+. odbc load,exec("
+> select 
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> womname,
+> husbname,
+> sawkint,
+> sadate,
+> workerid,
+> sastatus,
+> sadoc,
+> sadod,
+> sadaydrink,
+> sadawtwat,
+> sadawtwatc,
+> sadawata,
+> sadawatatc,
+> sadafdrink,
+> sadafdrinkwt,
+> sadawtjpp,
+> sadajppb,
+> sadamett,
+> sadawhr,
+> sadafmv,
+> sadasmv,
+> sadpydrink,
+> sadpwtwat,
+> sadpwata,
+> sadpfdrink,
+> sadpyjpp,
+> sadpmett,
+> sawateradd,
+> safrotoadd,
+> sadaydrinkr,
+> samarkw,
+> samarkwvl,
+> samarkf,
+> samarkfvl,
+> sadawtjppr,
+> sadajppbr,
+> sadamettr,
+> sadawhrr,
+> sadafmvr,
+> sadasmvr,
+> version,
+> today,
+> start,
+> [end],
+> sadf1,
+> sadfp1,
+> formorder,
+> arm,
+> ramadan,
+> samarkw1,
+> samarkf1,
+> scheduleid,
+> hhchange,
+> newhhid,
+> idenconf,
+> /*insert_time,*/
+> /*update_time,*/
+> /*_submission_time,*/
+> /*_submitted_by,*/
+> /*_date_modified,*/
+> /*_xform_id,*/
+> instanceid,
+> /*_duration,*/
+> /*_media_all_received,*/
+> /*_media_count,*/
+> _id
+> /*_uuid,*/
+> /*_version,*/
+> /*_total_media,*/
+> /*id,*/
+> /*duplicate,*/
+> from [mindr-live].dbo.safpw_mv 
+> ") dsn("rammps");
+
+. fixdate sadate sadoc sadod;
+(50,253 real changes made)
+(25 real changes made)
+(0 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. save "..\datasets\stata\saf_pw.dta", replace
+file ..\datasets\stata\saf_pw.dta saved
+
+. saveold "..\datasets\stata\saf_pw.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\saf_pw.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\saf_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:22
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_saf_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\saf_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\saf_wra.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:22
+
+. odbc load,exec("
+> select 
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> sawkint,
+> sadate,
+> workerid,
+> sastatus,
+> sadoc,
+> sadod,
+> sadaydrink,
+> sadawtwat,
+> sadawtwatc,
+> sadawata,
+> sadawatatc,
+> sadafdrink,
+> sadafdrinkwt,
+> sadawtjpp,
+> sadajppb,
+> sadamett,
+> sadawhr,
+> sadafmv,
+> sadasmv,
+> sadpydrink,
+> sadpwtwat,
+> sadpwata,
+> sadpfdrink,
+> sadpyjpp,
+> sadpmett,
+> sawateradd,
+> safrotoadd,
+> sadaydrinkr,
+> samarkw,
+> samarkwvl,
+> samarkf,
+> samarkfvl,
+> sadawtjppr,
+> sadajppbr,
+> sadamettr,
+> sadawhrr,
+> sadafmvr,
+> sadasmvr,
+> version,
+> today,
+> start,
+> [end],
+> sadf1,
+> sadfp1,
+> formorder,
+> _id,
+> _submission_time,
+> schedule_id,
+> duplicate
+> FROM [mindr-live].dbo.saf_wra_mv 
+> ") dsn("rammps");
+
+. fixdate sadate;
+(24,408 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. save "..\datasets\stata\saf_wra.dta", replace
+file ..\datasets\stata\saf_wra.dta saved
+
+. saveold "..\datasets\stata\saf_wra.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\saf_wra.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\saf_wra.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:23
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_serf_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\serf_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\serf_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:23
+
+. odbc load,exec("
+> 
+> select 
+> 
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> womname,
+> husbname,
+> idenconf,
+> jw.jivitaweek as srwkint,
+> convert(smalldatetime, srdate,121) as srdate,
+> workerid,
+> srstatus,
+> srdod,
+> /*Section 1*/
+> srrp_wmf,
+> srrp_bp,
+> srrp_hemo,
+> aslt1,
+> aslt2,
+> srrp_px,
+> srrpdec,
+> /*Section C*/
+> srtmpstp,
+> version,
+> today,
+> start,
+> [end]
+> from [mindr-live].dbo.all_serf_pw sp
+> left join shapla.dbo.jivitaweek jw on jw.romandate = convert(smalldatetime,sp
+> .srdate,121) 
+> where duplicate is null 
+> ") dsn("rammps");
+
+. fixdate srdate;
+(118 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. 
+. //Calculate the number of splits needed
+. local max_length_an = 242
+
+. local num_splits_an = ceil(strlen(srrp_wmf) / `max_length_an')+1
+
+. 
+. //Create new variables to hold the splits
+. forval i = 1/`num_splits_an' {
+  2.     gen srrp_wmf`i' = substr(srrp_wmf, (`i' - 1) * `max_length_an' + 1, `m
+> ax_length_an')
+  3. }
+(23 missing values generated)
+(49 missing values generated)
+(97 missing values generated)
+
+. 
+. 
+. drop srrp_wmf
+
+. 
+. //recast str244 aeflist, force
+. 
+. 
+. //Calculate the number of splits needed
+. local max_length_an = 242
+
+. local num_splits_an = ceil(strlen(srrp_bp) / `max_length_an')+1
+
+. 
+. //Create new variables to hold the splits
+. forval i = 1/`num_splits_an' {
+  2.     gen srrp_bp`i' = substr(srrp_bp, (`i' - 1) * `max_length_an' + 1, `max
+> _length_an')
+  3. }
+(15 missing values generated)
+(115 missing values generated)
+
+. 
+. 
+. drop srrp_bp
+
+. 
+. 
+. 
+. //Calculate the number of splits needed
+. local max_length_an = 242
+
+. local num_splits_an = ceil(strlen(srrp_hemo) / `max_length_an')+1
+
+. 
+. //Create new variables to hold the splits
+. forval i = 1/`num_splits_an' {
+  2.     gen srrp_hemo`i' = substr(srrp_hemo, (`i' - 1) * `max_length_an' + 1, 
+> `max_length_an')
+  3. }
+(118 missing values generated)
+
+. 
+. 
+. drop srrp_hemo
+
+. 
+. 
+. 
+. //Calculate the number of splits needed
+. local max_length_an = 242
+
+. local num_splits_an = ceil(strlen(srrp_px) / `max_length_an')+1
+
+. 
+. //Create new variables to hold the splits
+. forval i = 1/`num_splits_an' {
+  2.     gen srrp_px`i' = substr(srrp_px, (`i' - 1) * `max_length_an' + 1, `max
+> _length_an')
+  3. }
+(72 missing values generated)
+
+. 
+. 
+. drop srrp_px
+
+. 
+. 
+. 
+. 
+. save "..\datasets\stata\serf_pw.dta", replace
+file ..\datasets\stata\serf_pw.dta saved
+
+. saveold "..\datasets\stata\serf_pw.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\serf_pw.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\serf_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:23
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_ses_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*ses_pw*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> capture log close;
+
+. log using "..\datasets\logs\ses_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\ses_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:23
+
+. odbc load,exec("
+> select
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> /*hhchange,*/
+> /*newhhid,*/
+> sswkint,
+> ssdate,
+> /*womname,*/
+> /*husbname,*/
+> /*idenconf,*/
+> workerid,
+> ssstatus,
+> ssdoc,
+> ssdod,
+> sshdl1,
+> sshde1,
+> sshdo1,
+> sshdo1s,
+> sshdemp1,
+> sshdtype1,
+> sshdtype1s,
+> sshdworkd1,
+> sshdvs2,
+> sshda2,
+> sshdl2,
+> sshde2,
+> sshdo2,
+> sshdo2s,
+> sshdemp2,
+> sshdtype2,
+> sshdtype2s,
+> sshdworkd2,
+> sshhm50,
+> sshhf50,
+> sshhm1949,
+> sshhf1949,
+> sshhs1949,
+> sshhm1318,
+> sshhf1318,
+> sshhs1318,
+> sshhm512,
+> sshhf512,
+> sshhs512,
+> sshhm04,
+> sshhf04,
+> sshhs04,
+> ssfmoutside,
+> ssfmincome,
+> ssreligion,
+> sscattle,
+> ssgoats,
+> sschickens,
+> ssducks,
+> ssland,
+> sslandu,
+> sselectric,
+> sssolar,
+> sscycle,
+> ssmotorc,
+> ssmrickshaw,
+> ssnmarickshaw,
+> sswoodbed,
+> ssclock,
+> sssewmach,
+> ssalmira,
+> ssdtable,
+> sstabfans,
+> sscng,
+> sstv,
+> sspc,
+> ssmobile,
+> ssradios,
+> sscfans,
+> sstubewell,
+> ssirrpump,
+> sstractor,
+> ssbatauto,
+> ssrefrig,
+> sslivrm,
+> ssgfloor,
+> ssroof,
+> sskitchen,
+> sstoilet,
+> ssdwater,
+> sscwater,
+> ssbwater,
+> sswwater,
+> ssawater,
+> ssfswor,
+> ssfsworh,
+> ssfspref,
+> ssfsprefh,
+> ssfslim,
+> ssfslimh,
+> ssfssome,
+> ssfssomeh,
+> ssfssmall,
+> ssfssmallh,
+> ssfsfew,
+> ssfsfewh,
+> ssfsnofood,
+> ssfsnofoodh,
+> ssfsnight,
+> ssfsnighth,
+> ssfswholed,
+> ssfswholedh,
+> version,
+> today,
+> start,
+> [end],
+> scheduleid
+> from [mindr-live].dbo.sespw_mv
+> 
+> ") dsn("rammps");
+
+. fixdate ssdate ssdoc ssdod;
+(352 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\ses_pw.dta", replace
+file ..\datasets\stata\ses_pw.dta saved
+
+. saveold "..\datasets\stata\ses_pw.dta",replace version(12)  /*restored 2024.0
+> 6.10  removed 2024.05.14  */
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\ses_pw.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\ses_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:23
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_ses_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*ses_wra*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> capture log close;
+
+. log using "..\datasets\logs\ses_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\ses_wra.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:23
+
+. odbc load,exec("
+> select
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> /*hhchange,*/
+> /*newhhid,*/
+> /*sswkint,*/
+> ssdate,
+> /*womname,*/
+> /*husbname,*/
+> /*idenconf,*/
+> workerid,
+> ssstatus,
+> ssdoc,
+> ssdod,
+> sshdl1,
+> sshde1,
+> sshdo1,
+>  sshdo1s,
+> sshdemp1,
+> sshdtype1,
+> sshdtype1s,
+> sshdworkd1,
+> sshdvs2,
+> sshda2,
+> sshdl2,
+> sshde2,
+> sshdo2,
+> sshdo2s,
+> sshdemp2,
+> sshdtype2,
+> sshdtype2s,
+> sshdworkd2,
+> sshhm50,
+> sshhf50,
+> sshhm1949,
+> sshhf1949,
+> sshhs1949,
+> sshhm1318,
+> sshhf1318,
+> sshhs1318,
+> sshhm512,
+> sshhf512,
+> sshhs512,
+> sshhm04,
+> sshhf04,
+> sshhs04,
+> ssfmoutside,
+> ssfmincome,
+> ssreligion,
+> sscattle,
+> ssgoats,
+> sschickens,
+> ssducks,
+> ssland,
+> sslandu,
+> sselectric,
+> sssolar,
+> sscycle,
+> ssmotorc,
+> ssmrickshaw,
+> ssnmarickshaw,
+> sswoodbed,
+> ssclock,
+> sssewmach,
+> ssalmira,
+> ssdtable,
+> sstabfans,
+> sscng,
+> sstv,
+> sspc,
+> ssmobile,
+> ssradios,
+> sscfans,
+> sstubewell,
+> ssirrpump,
+> sstractor,
+> ssbatauto,
+> ssrefrig,
+> sslivrm,
+> ssgfloor,
+> ssroof,
+> sskitchen,
+> sstoilet,
+> ssdwater,
+> sscwater,
+> ssbwater,
+> sswwater,
+> ssawater,
+> ssfswor,
+> ssfsworh,
+> ssfspref,
+> ssfsprefh,
+> ssfslim,
+> ssfslimh,
+> ssfssome,
+> ssfssomeh,
+> ssfssmall,
+> ssfssmallh,
+> ssfsfew,
+> ssfsfewh,
+> ssfsnofood,
+> ssfsnofoodh,
+> ssfsnight,
+> ssfsnighth,
+> ssfswholed,
+> ssfswholedh,
+> version,
+> today,
+> start,
+> [end],
+> scheduleid
+> FROM [mindr-live].dbo.seswra_mv
+> ") dsn("rammps");
+
+. fixdate ssdate;
+(288 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\ses_wra.dta", replace
+file ..\datasets\stata\ses_wra.dta saved
+
+. saveold "..\datasets\stata\ses_wra.dta",replace version(12)  /*restored 2024.
+> 06.10  removed 2024.05.14  */
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\ses_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\ses_wra.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:23
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_sif_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\sif.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\sif.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:23
+
+. odbc load,exec("
+> select
+> s.uid,
+> s.tlpin,
+> s.sector,
+> s.hhid,
+> /*womname,*/
+> /*husbname,*/
+> idenconf,
+> sidate,
+> workerid,
+> sistatus,
+> sistmnt,
+> sisalttype,
+> sisaltstore,
+> sisaltstores,
+> silid,
+> siresult,
+> version,
+> today,
+> start,
+> [end],
+> update_time,
+> updateed_by,
+> insert_time,
+> inserted_by,
+> instance_id,
+> scheduleid,
+> id,
+> _date_modified,
+> _duration,
+> _id,
+> _media_all_received,
+> _media_count,
+> /*_notes,*/
+> _submission_time,
+> _submitted_by,
+> /*_tags,*/
+> _total_media,
+> _uuid,
+> _version,
+> _xform_id,
+> hhchange,
+> newhhid,
+> duplicate
+> FROM [mindr-live].dbo.sif_mv s 
+> left join [mindr-live].dbo.pregtrak p on p.uid = s.uid 
+> where p.uid is not null 
+> ") dsn("rammps");
+
+. fixdate sidate;
+(354 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. foreach v of varlist si* {
+  2.      if !inlist("`v'", "sidate","sisaltstores") {
+  3.             replace `v' = "" if (`v' == "n/a" )
+  4.         destring `v', force replace
+  5.      }
+  6. }
+(0 real changes made)
+sistatus: all characters numeric; replaced as byte
+(0 real changes made)
+sistmnt: contains nonnumeric characters; replaced as byte
+(354 missing values generated)
+(0 real changes made)
+sisalttype: all characters numeric; replaced as byte
+(7 missing values generated)
+(0 real changes made)
+sisaltstore: all characters numeric; replaced as byte
+(7 missing values generated)
+(0 real changes made)
+silid: all characters numeric; replaced as byte
+(7 missing values generated)
+(0 real changes made)
+siresult: all characters numeric; replaced as byte
+(7 missing values generated)
+
+. 
+. 
+. 
+. save "..\datasets\stata\sif_pw.dta", replace
+file ..\datasets\stata\sif_pw.dta saved
+
+. saveold "..\datasets\stata\sif_pw.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\sif_pw.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\sif.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:23
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_sif_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\sif.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\sif.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:23
+
+. odbc load,exec("
+> select
+> s.uid,
+> s.tlpin,
+> s.sector,
+> s.hhid,
+> /*womname,*/
+> /*husbname,*/
+> idenconf,
+> sidate,
+> workerid,
+> sistatus,
+> sistmnt,
+> sisalttype,
+> sisaltstore,
+> sisaltstores,
+> silid,
+> siresult,
+> version,
+> today,
+> start,
+> [end],
+> update_time,
+> updateed_by,
+> insert_time,
+> inserted_by,
+> instance_id,
+> scheduleid,
+> id,
+> _date_modified,
+> _duration,
+> _id,
+> _media_all_received,
+> _media_count,
+> /*_notes,*/
+> _submission_time,
+> _submitted_by,
+> /*_tags,*/
+> _total_media,
+> _uuid,
+> _version,
+> _xform_id,
+> hhchange,
+> newhhid,
+> duplicate
+> FROM [mindr-live].dbo.sif_mv s 
+> left join [mindr-live].dbo.wtrak_wra w on w.uid = s.uid 
+> where w.uid is not null 
+> 
+> ") dsn("rammps");
+
+. fixdate sidate;
+(286 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. foreach v of varlist si* {
+  2.      if !inlist("`v'", "sidate","sisaltstores") {
+  3.             replace `v' = "" if (`v' == "n/a" )
+  4.         destring `v', force replace
+  5.      }
+  6. }
+(0 real changes made)
+sistatus: all characters numeric; replaced as byte
+(0 real changes made)
+sistmnt: contains nonnumeric characters; replaced as byte
+(286 missing values generated)
+(0 real changes made)
+sisalttype: all characters numeric; replaced as byte
+(6 missing values generated)
+(0 real changes made)
+sisaltstore: all characters numeric; replaced as byte
+(6 missing values generated)
+(0 real changes made)
+silid: all characters numeric; replaced as byte
+(6 missing values generated)
+(0 real changes made)
+siresult: all characters numeric; replaced as byte
+(6 missing values generated)
+
+. 
+. 
+. 
+. save "..\datasets\stata\sif_wra.dta", replace
+file ..\datasets\stata\sif_wra.dta saved
+
+. saveold "..\datasets\stata\sif_wra.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\sif_wra.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\sif.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:23
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_suf_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\suf_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\suf_wra.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:23
+
+. odbc load,exec("
+> select
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> /*womname,*/
+> /*husbname,*/
+> idenconf,
+> sudate,
+> suwkint,
+> workerid,
+> sustatus,
+> suvisit,
+> sudod,
+> suucol,
+> sufrsturin,
+> suebcu,
+> sutimebcu,
+> suudt,
+> suucoltm,
+> sumidu,
+> suubkcb,
+> suupudt,
+> susampt,
+> suuspcid,
+> /*st,*/
+> vt,
+> supt,
+> suussts,
+> workerid_urn,
+> suscol,
+> suins,
+> sucons,
+> suddef,
+> sutdef,
+> suddefc,
+> susbkcb,
+> sutdecc,
+> susspcid,
+> /*st1,*/
+> vts,
+> supts,
+> susssts,
+> workerid_stl,
+> version,
+> today,
+> start,
+> [end],
+> formorder,
+> scheduleid,
+> case when suucolres ='null' then null else suucolres end as suucolres ,
+> duplicate 
+> FROM [mindr-live].dbo.suf_wra_mv
+> ") dsn("rammps");
+
+. fixdate sudate;
+(826 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. save "..\datasets\stata\suf_wra.dta", replace
+file ..\datasets\stata\suf_wra.dta saved
+
+. saveold "..\datasets\stata\suf_wra.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\suf_wra.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\suf_wra.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:23
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_urf.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*urf*/
+> set more off;
+
+. /*set memory 700m;   */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\urf.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\urf.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:23
+
+. odbc load,exec("
+> SELECT
+> UID,
+> VERSION,
+> today,
+> start,
+> scheduleID,
+> tlpin,
+> Sector,
+> HHID,
+> HHCHANGE,
+> NEWHHID,
+> jw.JiVitaWeek AS urwkint ,
+> convert(smalldatetime,urdate,121) as urdate,
+> /*
+> womname,
+> husbname,
+> */
+> IDENCONF,
+> workerid,
+> urstatus,
+> urdoc,
+> urdod,
+> urabnormc,
+> urabnormi,
+> urdiagnosis,
+> urresp,
+> urrefs
+> FROM     [mindr-live].dbo.all_urf INNER JOIN
+>                   shapla.dbo.JiVitAWeek AS jw ON jw.RomanDate = CONVERT(small
+> datetime, all_urf.urdate, 121)
+> WHERE  (all_urf.duplicate IS NULL)
+> 
+> ") dsn("rammps");
+
+. fixdate urdate;
+(3 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\urf.dta", replace
+file ..\datasets\stata\urf.dta saved
+
+. saveold "..\datasets\stata\urf.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\urf.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\urf.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:23
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_uvf.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*uvf*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\uvf.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\uvf.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:23
+
+. odbc load,exec("
+> select
+> id,
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> /*womname,*/
+> /*husbname,*/
+> uvwkint,
+> uvdate,
+> workerid,
+> uvstatus,
+> uvpregstatus,
+> uvfetus,
+> dob,
+> doc,
+> /*Sec B 1 - Embryo/fetus number 1*/
+> uvcrl11,
+> uvcrl21,
+> uvcrl31,
+> uvcrlcmt1,
+> uvbpd11,
+> uvbpd21,
+> uvbpd31,
+> uvbpdcmt1,
+> uvhc11,
+> uvhc21,
+> uvhc31,
+> uvhccmt1,
+> uvfl11,
+> uvfl21,
+> uvfl31,
+> uvflcmt1,
+> uvpregperiod1,
+> uvusref1,
+> /*Sec B 2 - Embryo/fetus number 2*/
+> uvcrl12,
+> uvcrl22,
+> uvcrl32,
+> uvcrlcmt2,
+> uvbpd12,
+> uvbpd22,
+> uvbpd32,
+> uvbpdcmt2,
+> uvhc12,
+> uvhc22,
+> uvhc32,
+> uvhccmt2,
+> uvfl12,
+> uvfl22,
+> uvfl32,
+> uvflcmt2,
+> uvpregperiod2,
+> uvusref2,
+> /*Sec B 3 - Embryo/fetus number 3*/
+> uvcrl13,
+> uvcrl23,
+> uvcrl33,
+> uvcrlcmt3,
+> uvbpd13,
+> uvbpd23,
+> uvbpd33,
+> uvbpdcmt3,
+> uvhc13,
+> uvhc23,
+> uvhc33,
+> uvhccmt3,
+> uvfl13,
+> uvfl23,
+> uvfl33,
+> uvflcmt3,
+> uvpregperiod3,
+> uvusref3        ,
+> /*Sec B 4 - Embryo/fetus number 4*/
+> uvcrl14,
+> uvcrl24,
+> uvcrl34,
+> uvcrlcmt4,
+> uvbpd14,
+> uvbpd24,
+> uvbpd34,
+> uvbpdcmt4,
+> uvhc14,
+> uvhc24,
+> uvhc34,
+> uvhccmt4,
+> uvfl14,
+> uvfl24,
+> uvfl34,
+> uvflcmt4,
+> uvpregperiod4,
+> uvusref4,
+> /* meta data */
+> version,
+> today,
+> start,
+> [end],
+> schedule_id,
+> hhchange,
+> newhhid,
+> idenconf,
+> insert_time,
+> update_time,
+> inserted_by,
+> updateed_by,
+> _submission_time,
+> _submitted_by,
+> _date_modified,
+> _xform_id,
+> instance_id,
+> _duration,
+> _media_all_received,
+> _media_count,
+> _id,
+> _uuid,
+> _version,
+> duplicate
+> from [mindr-live].dbo.uvf_mv uv
+> ") dsn("rammps");
+
+. fixdate uvdate;
+(351 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. save "..\datasets\stata\uvf.dta", replace
+file ..\datasets\stata\uvf.dta saved
+
+. saveold "..\datasets\stata\uvf.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\uvf.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\uvf.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:24
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_wef_nwef.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef_nwef_all*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\wef_nwef_all.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wef_nwef_all.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:24
+
+. odbc load,exec("
+> SELECT
+> uid,
+> /*pwuid,*/
+> tlpin,
+> sector,
+> hhid,
+> /*wewkint,*/
+> wedate,
+> workerid,
+> westatus,
+> wef_consent,
+> wef_fconsent,
+> wef_dconsent,
+> nwejivita,
+> nwejivitamc,
+> nwejivitacap,
+> nwejivitakcap,
+> nwejivitamob,
+> nwehhmerr,
+> /*wsts1,*/
+> nwewsts,
+> /*wsts,*/
+> /*nwedobdd,*/
+> /*nwedobmm,*/
+> /*nwedobyy,*/
+> nwedobdate as nwedob,
+> /*nwedobmmc,*/
+> /*nwedobddc,*/
+> /*agecal1,*/
+> /*agemm,*/
+> /*agedd,*/
+> /*agecal,*/
+> /*weagen,*/
+> wemarrlhus,
+> nwemarrydate,
+> nwehusage,
+> wecurpreg,
+> /*welmpddc,*/
+> /*welmpmm,*/
+> /*welmpyy,*/
+> /*welmpdd,*/
+> /*welmp,*/
+> welmpdate as welmp,
+> welmp3m,
+> /*lmp_display,*/
+> /*lmp_displayt,*/
+> /*lmp_displayt1,*/
+> weurt,
+> weinft,
+> wecurbfd,
+> wewant6m,
+> wefpm,
+> wefpt,
+> wef_pw_consent,
+> welrins,
+> weownmob,
+> wemobno,
+> wecont,
+> wecontno,
+> wecontown,
+> weothmarr,
+> wenomarr,
+> /*surt,*/
+> /*surtc,*/
+> version,
+> today,
+> start,
+> [end],
+> /*subdd,*/
+> /*submm,*/
+> /*subyy,*/
+> scheduleid,
+> /*hhchange,*/
+> /*newhhid,*/
+> /*idenconf,*/
+> /*pwcon,*/
+> /*insert_time,*/
+> /*update_time,*/
+> /*_submission_time,*/
+> /*_submitted_by,*/
+> /*_date_modified,*/
+> /*_xform_id,*/
+> instanceid,
+> /*_duration,*/
+> /*_media_all_received,*/
+> /*_media_count,*/
+> _id,
+> /*_uuid,*/
+> /*_version,*/
+> /*_total_media,*/
+> /*duplicate,*/
+> wef_src
+> FROM [mindr-live].dbo.wef_nwef_mv_prep
+> 
+> 
+> ") dsn("rammps");
+
+. fixdate wedate nwedob;
+(28,204 real changes made)
+(1,509 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\wef_nwef_all.dta", replace
+file ..\datasets\stata\wef_nwef_all.dta saved
+
+. saveold "..\datasets\stata\wef_nwef_all.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\wef_nwef_all.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wef_nwef_all.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:25
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_wef.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\wef.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wef.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:25
+
+. odbc load,exec("
+> select
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> /*womname,*/
+> /*husbname,*/
+> jw.jivitaweek as wewkint,
+> convert(smalldatetime,wedate,121) as wedate,
+> workerid,
+> westatus,
+> wef_consent,
+> wef_fconsent,
+> wef_dconsent,
+> weagen,
+> wemarrlhus,
+> wecurpreg,
+> welmpddc,
+> welmpmm,
+> welmpyy,
+> welmpdd,
+> welmp,
+> lmp_display,
+> weurt,
+> weinft,
+> wecurbfd,
+> wewant6m,
+> wefpm,
+> wefpt,
+> wef_pw_consent,
+> welrins,
+> weownmob,
+> wemobno,
+> wecont,
+> wecontno,
+> wecontown,
+> weothmarr,
+> wenomarr,
+> /*--not in table pw,*/
+> /*--not in table wra,*/
+> surt,
+> surtc,
+> version,
+> today,
+> start,
+> [end],
+> subdd,
+> submm,
+> subyy,
+> /*pwcon,*/
+> scheduleid,
+> hhchange,
+> newhhid,
+> idenconf,
+> insert_time,
+> update_time,
+> _submission_time,
+> _submitted_by,
+> _date_modified,
+> _xform_id,
+> instanceid,
+> _duration,
+> _media_all_received,
+> _media_count,
+> _id,
+> _uuid,
+> _version,
+> duplicate
+> from [mindr-live].dbo.all_wef
+> join shapla.dbo.JiVitAWeek jw on jw.RomanDate = convert(smalldatetime,wedate,
+> 121)
+> where duplicate is null
+> 
+> ") dsn("rammps");
+
+. fixdate wedate;
+(21,570 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. save "..\datasets\stata\wef.dta", replace
+file ..\datasets\stata\wef.dta saved
+
+. saveold "..\datasets\stata\wef.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\wef.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wef.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:26
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_wmf_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\wmf_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wmf_pw.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:26
+
+. odbc load,exec("
+> select 
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> /*womname,*/
+> /*husbname,*/
+> idenconf,
+> wmdate,
+> workerid,
+> wmstatus,
+> wmdoc,
+> wmdod,
+> wmnsvmt7,
+> wmdiar7,
+> wmtoes7,
+> wmrash7,
+> wmhair7,
+> wmweak7,
+> wmhach7,
+> wmvision7,
+> wmbleed7,
+> wmdys7,
+> wmbruis7,
+> wmodor7,
+> /*serfgen,*/
+> version,
+> today,
+> start,
+> [end],
+> formorder,
+> scheduleid
+> 
+> from [mindr-live].dbo.wmfpw_mv
+> 
+> 
+> ") dsn("rammps");
+
+. fixdate wmdate;
+(7,632 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. save "..\datasets\stata\wmf_pw.dta", replace
+file ..\datasets\stata\wmf_pw.dta saved
+
+. saveold "..\datasets\stata\wmf_pw.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\wmf_pw.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wmf_pw.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:26
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_wmf_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\wmf_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wmf_wra.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:26
+
+. odbc load,exec("
+> select 
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> /*hhchange,*/
+> /*newhhid,*/
+> /*womname,*/
+> /*husbname,*/
+> /*idenconf,*/
+> convert(smalldatetime,wmdate,121) as wmdate,
+> workerid,
+> wmstatus,
+> wmdoc,
+> wmdod,
+> wmnsvmt7,
+> wmdiar7,
+> wmtoes7,
+> wmrash7,
+> wmhair7,
+> wmweak7,
+> wmhach7,
+> wmvision7,
+> wmbleed7,
+> wmdys7,
+> wmbruis7,
+> wmodor7,
+> today,
+> start,
+> [end],
+> formorder,
+> scheduleid
+> 
+> from [mindr-live].dbo.wmfwra_mv
+> 
+> 
+> ") dsn("rammps");
+
+. fixdate wmdate ;
+(3,814 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. save "..\datasets\stata\wmf_wra.dta", replace
+file ..\datasets\stata\wmf_wra.dta saved
+
+. saveold "..\datasets\stata\wmf_wra.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\wmf_wra.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wmf_wra.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:26
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_woman_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\woman.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\woman.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:26
+
+. odbc load,exec("select
+> uid,
+> insert_time,
+> inserted_by,
+> update_time,
+> updateed_by,
+> age,
+> age_grp,
+> allocated_arm,
+> convert(smalldatetime,blood_cal_date_lpf,121) as blood_cal_date_lpf,
+> convert(smalldatetime,blood_cal_date_mop,121) as blood_cal_date_mop,
+> convert(smalldatetime,blood_cal_date_mpf,121) as blood_cal_date_mpf,
+> convert(smalldatetime,blood_cal_date_pef,121) as blood_cal_date_pef,
+> blood_cal_status_lpf,
+> blood_cal_status_mop,
+> blood_cal_status_mpf,
+> blood_cal_status_pef,
+> blood_hmglbn_lpf,
+> blood_hmglbn_mop,
+> blood_hmglbn_mpf,
+> blood_hmglbn_pef,
+> convert(smalldatetime,bnf_done_date,121) as bnf_done_date,
+> bnf_status,
+> changed_hhid,
+> dod,
+> drf1_complete,
+> convert(smalldatetime,drf1_done_date,121) as drf1_done_date,
+> drf1_status,
+> convert(smalldatetime,drf2_done_date,121) as drf2_done_date,
+> drf2_status,
+> drf3_complete,
+> convert(smalldatetime,drf3_done_date,121) as drf3_done_date,
+> drf3_status,
+> convert(smalldatetime,drf4_done_date,121) as drf4_done_date,
+> drf4_status,
+> drf5_complete,
+> convert(smalldatetime,drf5_done_date,121) as drf5_done_date,
+> drf5_status,
+> convert(smalldatetime,drf6_done_date,121) as drf6_done_date,
+> drf6_status,
+> drf7_complete,
+> convert(smalldatetime,drf7_done_date,121) as drf7_done_date,
+> drf7_status,
+> convert(smalldatetime,drf8_done_date,121) as drf8_done_date,
+> drf8_status,
+> enrollment_id,
+> convert(smalldatetime,fbaf_done_date,121) as fbaf_done_date,
+> fbaf_status,
+> hhid,
+> /*husband_name,*/
+> convert(smalldatetime,i1mop_done_date,121) as i1mop_done_date,
+> i1mop_status,
+> convert(smalldatetime,ibaf_done_date,121) as ibaf_done_date,
+> ibaf_status,
+> convert(smalldatetime,lpf_done_date,121) as lpf_done_date,
+> lpf_status,
+> convert(smalldatetime,lpfb_done_date,121) as lpfb_done_date,
+> lpfb_status,
+> convert(smalldatetime,m1mop_done_date,121) as m1mop_done_date,
+> m1mop_status,
+> convert(smalldatetime,mbaf_done_date,121) as mbaf_done_date,
+> mbaf_status,
+> mobile,
+> mopb_status,
+> convert(smalldatetime,mpf_done_date,121) as mpf_done_date,
+> mpf_status,
+> convert(smalldatetime,mpfb_done_date,121) as mpfb_done_date,
+> mpfb_status,
+> convert(smalldatetime,mopb_done_date,121) as mopb_done_date,
+> convert(smalldatetime,outcome_date,121) as outcome_date,
+> outcome_status,
+> pef_consent,
+> convert(smalldatetime,pef_consent_date,121) as pef_consent_date,
+> convert(smalldatetime,pef_done_date,121) as pef_done_date,
+> pef_eligable,
+> pef_status,
+> convert(smalldatetime,pefb_done_date,121) as pefb_done_date,
+> pefb_status,
+> convert(smalldatetime,psf_done_date,121) as psf_done_date,
+> psf_eligable,
+> convert(smalldatetime,psf_lmp_date,121) as psf_lmp_date,
+> psf_status,
+> psf_urt,
+> convert(smalldatetime,saf_done_date,121) as saf_done_date,
+> saf_past_order,
+> saf_status,
+> sector,
+> convert(smalldatetime,ses_done_date,121) as ses_done_date,
+> ses_status,
+> convert(smalldatetime,stool_cal_date_suf1,121) as stool_cal_date_suf1,
+> convert(smalldatetime,stool_cal_date_suf2,121) as stool_cal_date_suf2,
+> convert(smalldatetime,stool_cal_date_suf3,121) as stool_cal_date_suf3,
+> convert(smalldatetime,stool_cal_date_suf4,121) as stool_cal_date_suf4,
+> stool_cal_status_suf1,
+> stool_cal_status_suf2,
+> stool_cal_status_suf3,
+> stool_cal_status_suf4,
+> convert(smalldatetime,sudf1_done_date,121) as sudf1_done_date,
+> sudf1_status,
+> convert(smalldatetime,sudf2_done_date,121) as sudf2_done_date,
+> sudf2_status,
+> convert(smalldatetime,sudf3_done_date,121) as sudf3_done_date,
+> sudf3_status,
+> convert(smalldatetime,sudf4_done_date,121) as sudf4_done_date,
+> sudf4_status,
+> convert(smalldatetime,sudf5_done_date,121) as sudf5_done_date,
+> sudf5_status,
+> convert(smalldatetime,suf1_done_date,121) as suf1_done_date,
+> suf1_status,
+> convert(smalldatetime,suf2_done_date,121) as suf2_done_date,
+> suf2_status,
+> convert(smalldatetime,suf3_done_date,121) as suf3_done_date,
+> suf3_status,
+> convert(smalldatetime,suf4_done_date,121) as suf4_done_date,
+> suf4_status,
+> tlpin,
+> convert(smalldatetime,urine_cal_date_suf1,121) as urine_cal_date_suf1,
+> convert(smalldatetime,urine_cal_date_suf2,121) as urine_cal_date_suf2,
+> convert(smalldatetime,urine_cal_date_suf3,121) as urine_cal_date_suf3,
+> convert(smalldatetime,urine_cal_date_suf4,121) as urine_cal_date_suf4,
+> urne_cal_status_suf1,
+> urne_cal_status_suf2,
+> urne_cal_status_suf3,
+> urne_cal_status_suf4,
+> convert(smalldatetime,uvf_done_date,121) as uvf_done_date,
+> uvf_ga,
+> convert(smalldatetime,uvf_lmp_date,121) as uvf_lmp_date,
+> uvf_status,
+> convert(smalldatetime,wmf_done_date,121) as wmf_done_date,
+> wmf_past_order,
+> wmf_status,
+> /*woman_name,*/
+> drf2_complete,
+> drf4_complete,
+> mpf_ga,
+> lmp_status,
+> convert(smalldatetime,dvf_done_date,121) as dvf_done_date,
+> dvf_status,
+> convert(smalldatetime,eser_done_date,121) as eser_done_date,
+> eser_rpdesc,
+> convert(smalldatetime,serf_14v_done_date,121) as serf_14v_done_date,
+> serf_14v_status,
+> convert(smalldatetime,serf_2nd7hv_done_date,121) as serf_2nd7hv_done_date,
+> serf_2nd7hv_status,
+> convert(smalldatetime,serf_7hv_done_date,121) as serf_7hv_done_date,
+> serf_7hv_status,
+> convert(smalldatetime,serf_done_date,121) as serf_done_date,
+> convert(smalldatetime,serf_end_date,121) as serf_end_date,
+> convert(smalldatetime,serf_hv_done_date,121) as serf_hv_done_date,
+> serf_hv_rp_assmt,
+> serf_hv_status,
+> convert(smalldatetime,serf_start_date,121) as serf_start_date,
+> serf_status,
+> woman_source,
+> woman_status,
+> sadf1,
+> sadfp1,
+> saf_start,
+> wmf_start,
+> drink_status
+> from [mindr-live].dbo.woman_pw
+> ") dsn("rammps");
+
+. fixdate blood_cal_date_lpf blood_cal_date_mop blood_cal_date_mpf blood_cal_da
+> te_pef bnf_done_date drf1_done_date drf2_done_date drf3_done_date drf4_done_d
+> ate drf5_done_date drf6_done_date drf7_done_date drf8_done_date fbaf_done_dat
+> e i1mop_done_date ibaf_done_date lpf_done_date lpfb_done_date m1mop_done_date
+>  mbaf_done_date mpf_done_date mpfb_done_date mopb_done_date outcome_date pef_
+> consent_date pef_done_date pefb_done_date psf_done_date psf_lmp_date saf_done
+> _date ses_done_date stool_cal_date_suf1 stool_cal_date_suf2 stool_cal_date_su
+> f3 stool_cal_date_suf4 sudf1_done_date sudf2_done_date sudf3_done_date sudf4_
+> done_date sudf5_done_date suf1_done_date suf2_done_date suf3_done_date suf4_d
+> one_date urine_cal_date_suf1 urine_cal_date_suf2 urine_cal_date_suf3 urine_ca
+> l_date_suf4 uvf_done_date uvf_lmp_date wmf_done_date dvf_done_date eser_done_
+> date serf_14v_done_date serf_2nd7hv_done_date serf_7hv_done_date serf_done_da
+> te serf_end_date serf_hv_done_date serf_start_date;
+(238 real changes made)
+(287 real changes made)
+(284 real changes made)
+(337 real changes made)
+(294 real changes made)
+(377 real changes made)
+(274 real changes made)
+(265 real changes made)
+(290 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+(282 real changes made)
+(0 real changes made)
+(278 real changes made)
+(263 real changes made)
+(292 real changes made)
+(293 real changes made)
+(278 real changes made)
+(272 real changes made)
+(290 real changes made)
+(343 real changes made)
+(388 real changes made)
+(418 real changes made)
+(341 real changes made)
+(3,983 real changes made)
+(661 real changes made)
+(306 real changes made)
+(352 real changes made)
+(337 real changes made)
+(0 real changes made)
+(261 real changes made)
+(0 real changes made)
+(343 real changes made)
+(271 real changes made)
+(265 real changes made)
+(290 real changes made)
+(0 real changes made)
+(342 real changes made)
+(271 real changes made)
+(264 real changes made)
+(290 real changes made)
+(337 real changes made)
+(269 real changes made)
+(261 real changes made)
+(288 real changes made)
+(351 real changes made)
+(319 real changes made)
+(306 real changes made)
+(109 real changes made)
+(200 real changes made)
+(0 real changes made)
+(1 real change made)
+(4 real changes made)
+(268 real changes made)
+(264 real changes made)
+(5 real changes made)
+(274 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\woman_pw.dta", replace
+file ..\datasets\stata\woman_pw.dta saved
+
+. saveold "..\datasets\stata\woman_pw.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\woman_pw.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\woman.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:26
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_woman_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\woman_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\woman_wra.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:26
+
+. odbc load,exec("select
+> uid,
+> insert_time,
+> inserted_by,
+> update_time,
+> updateed_by,
+> age,
+> age_grp,
+> allocated_arm,
+> convert(smalldatetime,blood_cal_date_15b,121) as blood_cal_date_15b,
+> convert(smalldatetime,blood_cal_date_3b,121) as blood_cal_date_3b,
+> convert(smalldatetime,blood_cal_date_eb,121) as blood_cal_date_eb,
+> blood_cal_status_15b,
+> blood_cal_status_3b,
+> blood_cal_status_eb,
+> changed_hhid,
+> consent,
+> convert(smalldatetime,consent_date,121) as consent_date,
+> dod,
+> drf1_complete,
+> convert(smalldatetime,drf1_done_date,121) as drf1_done_date,
+> drf1_status,
+> convert(smalldatetime,drf2_done_date,121) as drf2_done_date,
+> drf2_status,
+> convert(smalldatetime,drf3_done_date,121) as drf3_done_date,
+> drf3_status,
+> enroll_id_age,
+> enroll_id_overall,
+> hhid,
+> /*husband_name,*/
+> mobile,
+> rpt_drf_eligible,
+> sadf1,
+> sadfp1,
+> convert(smalldatetime,saf_done_date,121) as saf_done_date,
+> saf_past_order,
+> saf_start,
+> saf_status,
+> sector,
+> selection_status,
+> convert(smalldatetime,serf_14d_done_date,121) as serf_14d_done_date,
+> serf_14d_saf_stop,
+> serf_14d_status,
+> convert(smalldatetime,serf_7d_done_date,121) as serf_7d_done_date,
+> serf_7d_saf_stop,
+> serf_7d_status,
+> serf_decision,
+> convert(smalldatetime,serf_done_date,121) as serf_done_date,
+> convert(smalldatetime,serf_end_date,121) as serf_end_date,
+> convert(smalldatetime,serf_hv_done_date,121) as serf_hv_done_date,
+> serf_hv_saf_stop,
+> serf_hv_status,
+> serf_saf_stop,
+> convert(smalldatetime,serf_start_date,121) as serf_start_date,
+> serf_status,
+> convert(smalldatetime,ses_done_date,121) as ses_done_date,
+> ses_status,
+> convert(smalldatetime,stool_cal_date_suf1,121) as stool_cal_date_suf1,
+> convert(smalldatetime,stool_cal_date_suf3,121) as stool_cal_date_suf3,
+> stool_cal_status_suf1,
+> stool_cal_status_suf3,
+> convert(smalldatetime,sudf1_done_date,121) as sudf1_done_date,
+> sudf1_status,
+> convert(smalldatetime,sudf2_done_date,121) as sudf2_done_date,
+> sudf2_status,
+> convert(smalldatetime,sudf3_done_date,121) as sudf3_done_date,
+> sudf3_status,
+> convert(smalldatetime,suf1_done_date,121) as suf1_done_date,
+> suf1_status,
+> convert(smalldatetime,suf2_done_date,121) as suf2_done_date,
+> suf2_status,
+> convert(smalldatetime,suf3_done_date,121) as suf3_done_date,
+> suf3_status,
+> tlpin,
+> convert(smalldatetime,urine_cal_date_suf1,121) as urine_cal_date_suf1,
+> convert(smalldatetime,urine_cal_date_suf2,121) as urine_cal_date_suf2,
+> convert(smalldatetime,urine_cal_date_suf3,121) as urine_cal_date_suf3,
+> urine_cal_status_suf1,
+> urine_cal_status_suf2,
+> urine_cal_status_suf3,
+> convert(smalldatetime,wmf_done_date,121) as wmf_done_date,
+> wmf_past_order,
+> wmf_start,
+> wmf_status,
+> /*woman_name,*/
+> woman_status,
+> convert(smalldatetime,wra15b_done_date,121) as wra15b_done_date,
+> wra15b_status,
+> convert(smalldatetime,wra3b_done_date,121) as wra3b_done_date,
+> wra3b_status,
+> convert(smalldatetime,weaeb_done_date,121) as weaeb_done_date,
+> wraeb_status,
+> wra_serial,
+> convert(smalldatetime,wravf1_1attm_date,121) as wravf1_1attm_date,
+> convert(smalldatetime,wravf1_done_date,121) as wravf1_done_date,
+> wravf1_status,
+> convert(smalldatetime,wravf2_done_date,121) as wravf2_done_date,
+> wravf2_status,
+> convert(smalldatetime,wravf3_done_date,121) as wravf3_done_date,
+> wravf3_status,
+> convert(smalldatetime,dvf_done_date,121) as dvf_done_date,
+> dvf_status,
+> convert(smalldatetime,eser_done_date,121) as eser_done_date,
+> eser_rpdesc,
+> convert(smalldatetime,px_done_date,121) as px_done_date,
+> drink_status,
+> convert(smalldatetime,serf_2nd7hv_done_date,121) as serf_2nd7hv_done_date,
+> serf_2nd7hv_status,
+> serf_hv_rp_assmt
+> from [mindr-live].dbo.woman_wra
+> ") dsn("rammps");
+
+. fixdate blood_cal_date_15b blood_cal_date_3b blood_cal_date_eb consent_date d
+> rf1_done_date drf2_done_date drf3_done_date saf_done_date serf_14d_done_date 
+> serf_7d_done_date serf_done_date serf_end_date serf_hv_done_date serf_start_d
+> ate ses_done_date stool_cal_date_suf1 stool_cal_date_suf3 sudf1_done_date sud
+> f2_done_date sudf3_done_date suf1_done_date suf2_done_date suf3_done_date uri
+> ne_cal_date_suf1 urine_cal_date_suf2 urine_cal_date_suf3 wmf_done_date wra15b
+> _done_date wra3b_done_date weaeb_done_date wravf1_1attm_date wravf1_done_date
+>  wravf2_done_date wravf3_done_date dvf_done_date eser_done_date px_done_date 
+> serf_2nd7hv_done_date ;
+(257 real changes made)
+(243 real changes made)
+(285 real changes made)
+(292 real changes made)
+(321 real changes made)
+(92 real changes made)
+(251 real changes made)
+(284 real changes made)
+(2 real changes made)
+(0 real changes made)
+(160 real changes made)
+(158 real changes made)
+(2 real changes made)
+(164 real changes made)
+(288 real changes made)
+(286 real changes made)
+(244 real changes made)
+(288 real changes made)
+(261 real changes made)
+(247 real changes made)
+(288 real changes made)
+(261 real changes made)
+(247 real changes made)
+(286 real changes made)
+(260 real changes made)
+(244 real changes made)
+(284 real changes made)
+(260 real changes made)
+(247 real changes made)
+(289 real changes made)
+(77 real changes made)
+(351 real changes made)
+(264 real changes made)
+(253 real changes made)
+(65 real changes made)
+(126 real changes made)
+(269 real changes made)
+(0 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\woman_wra.dta", replace
+file ..\datasets\stata\woman_wra.dta saved
+
+. saveold "..\datasets\stata\woman_wra.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\woman_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\woman_wra.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:26
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_woman.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\woman.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\woman.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:26
+
+. odbc load,exec("select
+> uid,
+> insert_time,
+> update_time,
+> changed_hhid,
+> enroll_hhid,
+> enroll_mobile,
+> enroll_sector,
+> enroll_tlpin,
+> husband_name,
+> nwef_hhid,
+> nwef_sector,
+> nwef_tlpin,
+> surt,
+> wecurpreg,
+> woman_dob_dd,
+> woman_dob_mm,
+> woman_dob_yy,
+> wef_consent,
+> wef_done_date,
+> wef_mobile_others,
+> wef_mobile_woman,
+> wef_pw_consent,
+> wef_stata,
+> weinfant,
+> welmp,
+> wemarrlhus,
+> wetfpm,
+> weurt,
+> woman_age,
+> woman_dob,
+> woman_name,
+> woman_source,
+> inserted_by,
+> updateed_by,
+> hhid,
+> sector,
+> wef_mopup_done_date,
+> wef_mopup_stata,
+> woman_status,
+> mopup2_surt,
+> wef_mopup2_done_date,
+> wef_mopup2_stata
+> from [mindr-live].dbo.woman
+> ") dsn("rammps");
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\woman.dta", replace
+file ..\datasets\stata\woman.dta saved
+
+. saveold "..\datasets\stata\woman.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\woman.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\woman.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:26
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_wra_1b_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wra_1b_wra*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\wra_1b_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wra_1b_wra.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:26
+
+. odbc load,exec("
+> SELECT
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> womname,
+> husbname,
+> idenconf,
+> w1bdate,
+> w1bwkint,
+> workerid,
+> w1bstatus,
+> w1bdod,
+> w1btemp,
+> w1btempn1,
+> w1bsysto1,
+> w1bdiast1,
+> w1bbptime1,
+> workerid_bp,
+> w1bweight,
+> w1bmuac1,
+> w1bmuac2,
+> w1bmuac3,
+> w1bsysto2,
+> w1bdiast2,
+> w1bbptime2,
+> w1bbptime2n,
+> workerid_an,
+> w1bmealdate,
+> w1bmealtime,
+> timegap,
+> w1bfood,
+> w1bblood1,
+> w1bblood2,
+> w1bspecid1,
+> w1bspecid2,
+> w1bbldtime,
+> w1bhemo,
+> w1bhemotab,
+> workerid_bl,
+> w1bbsmns,
+> w1bbsmnsd,
+> workerid_blm as workerid_mns,
+> version,
+> today,
+> start,
+> [end],
+> /*formorder,*/
+> scheduleid,
+> duplicate,
+> _date_modified,
+> _duration,
+> _media_all_received,
+> _media_count,
+> _id,
+> _uuid,
+> _version,
+> _submission_time,
+> _submitted_by,
+> _total_media,
+> _xform_id,
+> id,
+> insert_time,
+> update_time
+> FROM [mindr-live].dbo.wra_1b_mv
+> 
+> 
+> ") dsn("rammps");
+
+. fixdate w1bdate w1bmealdate;
+(260 real changes made)
+(257 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. destring w1bweight, force replace
+w1bweight: all characters numeric; replaced as double
+(3 missing values generated)
+
+. destring w1bmuac1, force replace
+w1bmuac1: all characters numeric; replaced as double
+(3 missing values generated)
+
+. destring w1bmuac2, force replace
+w1bmuac2: all characters numeric; replaced as double
+(3 missing values generated)
+
+. destring w1bmuac3, force replace
+w1bmuac3: all characters numeric; replaced as double
+(3 missing values generated)
+
+. 
+. 
+. foreach v of varlist w1bmuac* {
+  2.         replace `v' = . if (`v' == 00.0 | `v' == 99.9)
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. 
+. gen byte n_missing = (missing(w1bmuac1))+(missing(w1bmuac2))+(missing(w1bmuac
+> 3))
+
+. gen medw1bmuac = w1bmuac1+w1bmuac2+w1bmuac3-min(w1bmuac1, w1bmuac2, w1bmuac3)
+> -max(w1bmuac1, w1bmuac2, w1bmuac3) if n_missing==0
+(3 missing values generated)
+
+. replace medw1bmuac = (min(w1bmuac1, w1bmuac2, w1bmuac3)+max(w1bmuac1, w1bmuac
+> 2, w1bmuac3))/2 if n_missing==1
+(0 real changes made)
+
+. replace medw1bmuac = max(w1bmuac1, w1bmuac2, w1bmuac3) if n_missing==2
+(0 real changes made)
+
+. drop n_missing
+
+. 
+. 
+. replace w1bweight = . if (w1bweight == 0.00 | w1bweight == 99.9)
+(0 real changes made)
+
+. 
+. 
+. 
+. 
+. 
+. save "..\datasets\stata\wra_1b_wra.dta", replace
+file ..\datasets\stata\wra_1b_wra.dta saved
+
+. saveold "..\datasets\stata\wra_1b_wra.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\wra_1b_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wra_1b_wra.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:27
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_wra_3b_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wra_3b_wra*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\wra_3b_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wra_3b_wra.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:27
+
+. odbc load,exec("
+> SELECT
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> womname,
+> husbname,
+> idenconf,
+> w3bdate,
+> workerid,
+> w3bstatus,
+> w3bdod,
+> w3btemp,
+> w3btempn1,
+> w3bsysto1,
+> w3bdiast1,
+> w3bbptime1,
+> workerid_bp,
+> w3bweight,
+> w3bmuac1,
+> w3bmuac2,
+> w3bmuac3,
+> w3bsysto2,
+> w3bdiast2,
+> w3bbptime2,
+> w3bbptime2n,
+> workerid_an,
+> w3bmealdate,
+> w3bmealtime,
+> w3bmealtimec,
+> timegap,
+> w3bfood,
+> w3bblood1,
+> w3bblood2,
+> w3bspecid1,
+> st,
+> vt,
+> supt,
+> w3bspecid2,
+> st1,
+> vt1,
+> supt1,
+> w3bbldtime,
+> w3bhemo,
+> w3bhemotab,
+> workerid_bl,
+> w3bbsmns,
+> w3bbsmnsd,
+> workerid_blm as workerid_mns,
+> version,
+> today,
+> start,
+> [end],
+> /*form_order,*/
+> scheduleid,
+> duplicate,
+> _date_modified,
+> _duration,
+> _media_all_received,
+> _media_count,
+> _id,
+> _uuid,
+> _version,
+> _submission_time,
+> _submitted_by,
+> _total_media,
+> _xform_id,
+> id,
+> insert_time,
+> update_time
+> FROM [mindr-live].dbo.wra_3b_mv
+> 
+> 
+> ") dsn("rammps");
+
+. fixdate w3bdate w3bmealdate;
+(247 real changes made)
+(243 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. destring w3bweight, force replace
+w3bweight: all characters numeric; replaced as double
+(4 missing values generated)
+
+. destring w3bmuac1, force replace
+w3bmuac1: all characters numeric; replaced as double
+(4 missing values generated)
+
+. destring w3bmuac2, force replace
+w3bmuac2: all characters numeric; replaced as double
+(4 missing values generated)
+
+. destring w3bmuac3, force replace
+w3bmuac3: all characters numeric; replaced as double
+(4 missing values generated)
+
+. 
+. 
+. foreach v of varlist w3bmuac* {
+  2.         replace `v' = . if (`v' == 00.0 | `v' == 99.9)  
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. 
+. gen byte n_missing = (missing(w3bmuac1))+(missing(w3bmuac2))+(missing(w3bmuac
+> 3))
+
+. gen medw3bmuac = w3bmuac1+w3bmuac2+w3bmuac3-min(w3bmuac1, w3bmuac2, w3bmuac3)
+> -max(w3bmuac1, w3bmuac2, w3bmuac3) if n_missing==0
+(4 missing values generated)
+
+. replace medw3bmuac = (min(w3bmuac1, w3bmuac2, w3bmuac3)+max(w3bmuac1, w3bmuac
+> 2, w3bmuac3))/2 if n_missing==1
+(0 real changes made)
+
+. replace medw3bmuac = max(w3bmuac1, w3bmuac2, w3bmuac3) if n_missing==2
+(0 real changes made)
+
+. drop n_missing
+
+. 
+. 
+. replace w3bweight = . if (w3bweight == 0.00 | w3bweight == 99.9)
+(0 real changes made)
+
+. 
+. 
+. 
+. 
+. save "..\datasets\stata\wra_3b_wra.dta", replace
+file ..\datasets\stata\wra_3b_wra.dta saved
+
+. saveold "..\datasets\stata\wra_3b_wra.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\wra_3b_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wra_3b_wra.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:27
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_wra_eb_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wra_eb_wra*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\wra_eb_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wra_eb_wra.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:27
+
+. odbc load,exec("
+> SELECT
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> hhchange,
+> newhhid,
+> womname,
+> husbname,
+> idenconf,
+> webdate,
+> webwkint,
+> workerid,
+> webstatus,
+> webdod,
+> webtemp,
+> webtempn1,
+> websysto1,
+> webdiast1,
+> webbptime1,
+> workerid_bp,
+> webweight,
+> webheight1,
+> webheight2,
+> webheight3,
+> webmuac1,
+> webmuac2,
+> webmuac3,
+> websysto2,
+> webdiast2,
+> webbptime2,
+> webbptime2n,
+> workerid_an,
+> webmealdate,
+> webmealtime,
+> webmealtimec,
+> timegap,
+> webfood,
+> webblood1,
+> webblood2,
+> webspecid1,
+> st,
+> vt,
+> supt,
+> webspecid2,
+> st1,
+> vt1,
+> supt1,
+> webbldtime,
+> webhemo,
+> webhemotab,
+> webbltype,
+> webrhtype,
+> workerid_bl,
+> webbsmns,
+> webbsmnsd,
+> workerid_me as workerid_mns,
+> version,
+> today,
+> start,
+> [end],
+> /*formorder,*/
+> scheduleid,
+> duplicate,
+> _date_modified,
+> _duration,
+> _media_all_received,
+> _media_count,
+> _id,
+> _uuid,
+> _version,
+> _submission_time,
+> _submitted_by,
+> _total_media,
+> _xform_id,
+> id,
+> insert_time,
+> update_time
+> FROM [mindr-live].dbo.wra_eb_mv
+> ") dsn("rammps");
+
+. fixdate webdate webmealdate;
+(289 real changes made)
+(285 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. destring webweight, force replace
+webweight: all characters numeric; replaced as double
+(4 missing values generated)
+
+. destring webmuac1, force replace
+webmuac1: all characters numeric; replaced as double
+(4 missing values generated)
+
+. destring webmuac2, force replace
+webmuac2: all characters numeric; replaced as double
+(4 missing values generated)
+
+. destring webmuac3, force replace
+webmuac3: all characters numeric; replaced as double
+(4 missing values generated)
+
+. 
+. 
+. foreach v of varlist webmuac* {
+  2.         replace `v' = . if (`v' == 00.0 | `v' == 99.9)
+  3. }
+(0 real changes made)
+(0 real changes made)
+(0 real changes made)
+
+. 
+. 
+. gen byte n_missing = (missing(webmuac1))+(missing(webmuac2))+(missing(webmuac
+> 3))
+
+. gen medwebmuac = webmuac1+webmuac2+webmuac3-min(webmuac1, webmuac2, webmuac3)
+> -max(webmuac1, webmuac2, webmuac3) if n_missing==0
+(4 missing values generated)
+
+. replace medwebmuac = (min(webmuac1, webmuac2, webmuac3)+max(webmuac1, webmuac
+> 2, webmuac3))/2 if n_missing==1
+(0 real changes made)
+
+. replace medwebmuac = max(webmuac1, webmuac2, webmuac3) if n_missing==2
+(0 real changes made)
+
+. drop n_missing
+
+. 
+. 
+. replace webweight = . if (webweight == 0.00 | webweight == 99.9)
+(0 real changes made)
+
+. 
+. 
+. 
+. save "..\datasets\stata\wra_eb_wra.dta", replace
+file ..\datasets\stata\wra_eb_wra.dta saved
+
+. saveold "..\datasets\stata\wra_eb_wra.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\wra_eb_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wra_eb_wra.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:27
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_wratrak.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wra_vf*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\wratrak.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wratrak.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:27
+
+. odbc load,exec("
+> SELECT
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> wom_dob,
+> age_wef,
+> age_wra,
+> arm_wra,
+> consent,
+> consent_date,
+> lsi,
+> wb_date,
+> wb_status,
+> wbb_date,
+> wbb_time,
+> wbb_meal_time,
+> wbb_fast_time,
+> wbb_status,
+> wm_date,
+> wm_status,
+> wmb_date,
+> wmb_time,
+> wmb_meal_time,
+> wmb_fast_time,
+> wmb_status,
+> mid_study_status,
+> we_date,
+> we_status,
+> web_date,
+> web_time,
+> web_meal_time,
+> web_fast_time,
+> web_status,
+> end_study_status,
+> ses_date,
+> ses_status,
+> saf_date,
+> saf_status,
+> supp_status,
+> adh_mns,
+> adh_bep,
+> discnt
+> /*fdose_date,*/
+> /*edose_date,*/
+> /*totdose_days,*/
+> /*totdose_mns,*/
+> /*totdose_bep,*/
+> /*pcomp_mns,*/
+> /*pcomp_bep*/
+> FROM [mindr-live].dbo.wtrak_wra
+> ") dsn("rammps");
+
+. fixdate wom_dob consent_date wb_date wbb_date wm_date wmb_date we_date web_da
+> te ses_date saf_date  ;
+(607 real changes made)
+(289 real changes made)
+(289 real changes made)
+(289 real changes made)
+(264 real changes made)
+(260 real changes made)
+(253 real changes made)
+(247 real changes made)
+(288 real changes made)
+(284 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\wratrak.dta", replace
+file ..\datasets\stata\wratrak.dta saved
+
+. saveold "..\datasets\stata\wratrak.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\wratrak.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wratrak.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:27
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_wravf_e_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wravf_e_wra*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\wravf_e.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wravf_e.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:27
+
+. odbc load,exec("
+> SELECT
+> *
+> FROM [mindr-live].dbo.wravf_e_mv
+> ") dsn("rammps");
+
+. fixdate wvedate;
+(352 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\wravf_e_wra.dta", replace
+file ..\datasets\stata\wravf_e_wra.dta saved
+
+. saveold "..\datasets\stata\wravf_e_wra.dta",replace version(12) 
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\wravf_e_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wravf_e.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:27
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_wravf_f_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wravf_f_wra*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\wravf_f.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wravf_f.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:27
+
+. odbc load,exec("
+> SELECT
+> *
+> FROM [mindr-live].dbo.wravf_f_mv
+> ") dsn("rammps");
+
+. fixdate wvfdate;
+(253 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\wravf_f_wra.dta", replace
+file ..\datasets\stata\wravf_f_wra.dta saved
+
+. saveold "..\datasets\stata\wravf_f_wra.dta",replace version(12) 
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\wravf_f_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wravf_f.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:28
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_wravf_m_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wravf_m_wra*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\wravf_m_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wravf_m_wra.log
+  log type:  text
+ opened on:  28 Oct 2025, 15:25:28
+
+. odbc load,exec("
+> SELECT
+> *
+> FROM [mindr-live].dbo.wravf_m_mv
+> ") dsn("rammps");
+
+. fixdate wvmdate;
+(264 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. save "..\datasets\stata\wravf_m_wra.dta", replace
+file ..\datasets\stata\wravf_m_wra.dta saved
+
+. saveold "..\datasets\stata\wravf_m_wra.dta",replace version(12) 
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\wravf_m_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\wravf_m_wra.log
+  log type:  text
+ closed on:  28 Oct 2025, 15:25:28
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. //do generate_wtrak_pw.do
+. //do generate_wtrak_wra.do
+. 
+. do copy_stata_files_to_correct_trial.do
+
+. // Set paths
+. local source_path "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MiNDR/d
+> ata/datasets/stata"
+
+. local wra_path "../datasets/stata/WRA_study/"
+
+. local pw_path "../datasets/stata/PW_study/"
+
+. 
+. // Copy file from source to destination ,replace
+. copy "`source_path'/aef_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/bnf.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/drf_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/drf_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/fbaf.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/i1mop.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/ibaf.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/lab_proc_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/lab_proc_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/lab_recv_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/lab_recv_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/lab_store_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/lab_store_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/lpf_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/lpfb_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/m1mop_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/m1mopb_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/mbaf.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/mpf_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/mpfb_pw.dta" "`pw_path'" ,replace
+
+. //copy "`source_path'/nwef.dta" "`pw_path'" ,replace
+. copy "`source_path'/pef_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/pefb_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/psf.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/pregtrak.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/px_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/px_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/saf_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/saf_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/serf_pw.dta" "`pw_path'" ,replace
+
+. //copy "`source_path'/serf_wra.dta" "`wra_path'" ,replace
+. copy "`source_path'/ses_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/ses_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/sif_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/sif_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/suf_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/urf.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/uvf.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/wef_nwef_all.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/wef_nwef_all.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/wmf_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/wmf_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/woman_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/woman_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/wra_1b_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/wra_3b_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/wra_eb_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/wratrak.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/wravf_e_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/wravf_f_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/wravf_m_wra.dta" "`wra_path'" ,replace
+
+. //copy "`source_path'/wtrak_pw.dta" "`pw_path'" ,replace
+. //copy "`source_path'/wtrak_wra.dta" "`wra_path'" ,replace
+. 
+end of do-file
+
+. exit
+
+end of do-file

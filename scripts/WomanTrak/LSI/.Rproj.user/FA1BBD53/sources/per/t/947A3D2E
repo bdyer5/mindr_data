@@ -1,0 +1,28 @@
+{
+    "id": "947A3D2E",
+    "path": null,
+    "project_path": null,
+    "type": "object_explorer",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1753792434638.0,
+    "source_on_save": false,
+    "relative_order": 7,
+    "properties": {
+        "id": "71b55d54877f4d4b82c50ab40927ed4b",
+        "name": "dci_result",
+        "title": "dci_result",
+        "language": "R",
+        "source_window_id": "",
+        "Source": "Source"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 30962724186423411,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1753792434638,
+    "read_only": false,
+    "read_only_alternatives": []
+}

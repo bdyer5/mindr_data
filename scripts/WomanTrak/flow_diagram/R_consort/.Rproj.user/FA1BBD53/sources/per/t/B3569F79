@@ -1,0 +1,27 @@
+{
+    "id": "B3569F79",
+    "path": "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MiNDR/data/scripts/WomanTrak/flow_diagram/R_consort/code/consort_Diagram_20241130_biospecimen_PW1.Rmd",
+    "project_path": "code/consort_Diagram_20241130_biospecimen_PW1.Rmd",
+    "type": "r_markdown",
+    "hash": "3416353546",
+    "contents": "",
+    "dirty": false,
+    "created": 1734115437828.0,
+    "source_on_save": false,
+    "relative_order": 16,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "33,104",
+        "scrollLine": "12"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1734115490,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1734115490967,
+    "read_only": false,
+    "read_only_alternatives": []
+}

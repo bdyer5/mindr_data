@@ -1,0 +1,27 @@
+{
+    "id": "7D6EF595",
+    "path": "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MiNDR/data/scripts/WomanTrak/flow_diagram/R_consort/code/create_consort_20241018_biospecimen_20241118.R",
+    "project_path": "code/create_consort_20241018_biospecimen_20241118.R",
+    "type": "r_source",
+    "hash": "1225411575",
+    "contents": "",
+    "dirty": false,
+    "created": 1732044300629.0,
+    "source_on_save": false,
+    "relative_order": 14,
+    "properties": {
+        "tempName": "Untitled1",
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "295,0",
+        "scrollLine": "269"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1734117335,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1734117335,
+    "read_only": false,
+    "read_only_alternatives": []
+}

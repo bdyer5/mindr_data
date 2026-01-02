@@ -1,0 +1,194 @@
+rm(list=ls())
+
+setwd("C:/Users/bdyer/OneDrive - Johns Hopkins/COAH/COAH_2020/Resiliency/labData/code")
+library(tidyr)
+library(dplyr)
+library(tidyverse)
+library(readxl)
+library(REDCapR)
+source("./ids_exist_function.R")
+source("./REDCapCredentials.R")
+
+
+
+
+df_sc <- read_excel("..\\data\\2023readyforREDCap\\salivary cortisol\\formatted for REDCap\\2-3-23.Saliva Cortisol Data-formatted for REDCap.xlsx" , sheet = "formatted for redcap",col_types="text") 
+
+# df3_2 <- read.csv("..\\data\\\2023readyforREDCap\\Blood ACTH_OGTT\\3-15-22.Study Salivary Cortisol Data formatted.csv" ,TRUE,na.strings ="", stringsAsFactors = FALSE)
+
+df_s <- df_sc
+# colnames(df_s) <- tolower(colnames(df_s))
+
+colnames(df_s)
+dfs1 <- df_s %>%
+  rename(record_id = "Study ID",sample = "Sample") %>%
+  rename(dc24_cu_rslt =utf8::utf8_print(colnames(df_s[3])),dc24_cn_rslt=utf8::utf8_print(colnames(df_s[4])), redcap_instrument_name = "REDCap MEASURE NAME", redcap_event_name = "REDCap Visit" )
+
+
+unique(dfs1[6])
+
+dfs1$dc24_cn_rslt
+dfs1$dc24_cu_rslt
+
+
+dfs2 <- dfs1  %>%
+  mutate(sample=case_when(sample=="30'" ~"30",
+                          sample=="30'" ~"30",
+                          sample=="0.45833333333333331" ~"11a",
+                          sample=="0.66666666666666663" ~"4p",
+                          sample=="bedtime" ~"bed",                        
+                          TRUE ~as.character(sample)),
+         stressor=case_when(redcap_event_name=="RESTORE Baseline Visit A" ~"restore",
+                            redcap_event_name=="RESTORE 2 Baseline Visit B" ~"restore_p2",
+                            redcap_event_name=="REDI Baseline Visit A" ~"redi",
+                            redcap_event_name=="REDI 2 Baseline Visit A" ~"redi_p2",
+                            redcap_event_name=="REBOUND Baseline Visit A" ~"rebound",
+                            redcap_event_name=="REBOUND 2 Baseline Visit A" ~"rebound_p2",
+                            redcap_event_name=="City of Hope Baseline Visit A" ~"coh_p2",
+         ),
+         redcap_event_name=case_when(redcap_event_name=="RESTORE Baseline Visit A" ~"baseline_visit_a_arm_1",
+                                     redcap_event_name=="RESTORE 2 Baseline Visit B" ~"baseline_visit_b_arm_1",
+                                     redcap_event_name=="REDI Baseline Visit A" ~"baseline_visit_a_arm_1",
+                                     redcap_event_name=="REDI 2 Baseline Visit A" ~"baseline_visit_a_arm_1",
+                                     redcap_event_name=="REBOUND Baseline Visit A" ~"baseline_visit_a_arm_1",
+                                     redcap_event_name=="REBOUND 2 Baseline Visit A" ~"baseline_visit_a_arm_1",
+                                     redcap_event_name=="City of Hope Baseline Visit A" ~"baseline_visit_a_arm_1",
+                                     TRUE ~as.character(redcap_event_name)),
+         redcap_instrument_name=case_when(redcap_instrument_name=="Home 24 hour diurnal cortisol" ~"home_24_hour_diurnal_cortisol",
+                                          TRUE ~as.character(redcap_instrument_name))
+          ,
+         
+                                           dc24_cu_rslt=case_when(dc24_cu_rslt!="No Sample" ~as.numeric(dc24_cu_rslt),
+                                                                 dc24_cu_rslt=="No Sample" ~as.numeric(99),
+                                                                 TRUE ~as.numeric(dc24_cu_rslt)),
+                                           dc24_cn_rslt=case_when(dc24_cn_rslt!="No Sample" ~as.numeric(dc24_cn_rslt),
+                                                                  dc24_cn_rslt=="No Sample" ~as.numeric(99),
+                                                                 TRUE ~as.numeric(dc24_cn_rslt)
+         
+                                                                 )
+  )
+
+dfs3<- dfs2 %>%
+  mutate(dc24_cu_rslt=case_when(dc24_cu_rslt!=99 ~as.character(dc24_cu_rslt),
+                                                                           dc24_cu_rslt==99 ~as.character("No Sample"),
+                                                                           TRUE ~as.character(dc24_cu_rslt)),
+         dc24_cn_rslt=case_when(dc24_cn_rslt!=99 ~as.character(dc24_cn_rslt),
+                                dc24_cn_rslt==99 ~as.character("No Sample"),
+                                TRUE ~as.character(dc24_cn_rslt)),)
+
+
+dfs3 <-  dfs3 %>%
+  arrange(record_id)
+
+
+dfs3_piv <- dfs3 %>% 
+  pivot_wider(id_cols=c(record_id,redcap_instrument_name,redcap_event_name,stressor), names_from=sample, values_from = c(dc24_cu_rslt,dc24_cn_rslt))
+
+dfs3_piv$dc24_cu_rslt_4p
+
+
+
+
+
+# Split the different stressors out
+dfs_redi_p2 <- filter(dfs3_piv, stressor=="redi_p2") 
+dfs_rebound_p2 <- filter(dfs3_piv, stressor=="rebound_p2") 
+dfs_restore_p2 <- filter(dfs3_piv, stressor=="restore_p2") 
+dfs_coh_p2 <- filter(dfs3_piv, stressor=="coh_p2") 
+
+
+
+# drop the stressor name and instrument name - instrument name is irrelevant for REDCap importing purposes
+dfs_redi_p2 <-dfs_redi_p2 %>%
+  select(-c(stressor, redcap_instrument_name)) 
+dfs_rebound_p2 <- dfs_rebound_p2 %>%
+  select(-c(stressor, redcap_instrument_name)) 
+dfs_restore_p2 <- dfs_restore_p2 %>%
+  select(-c(stressor, redcap_instrument_name)) 
+dfs_coh_p2 <- dfs_coh_p2 %>%
+  select(-c(stressor, redcap_instrument_name)) 
+
+
+
+
+# order the data frames to aid visually 
+dfs_redi_p2 <-  dfs_redi_p2 %>%
+  arrange(record_id)
+
+dfs_rebound_p2 <-  dfs_rebound_p2 %>%
+  arrange(record_id)
+
+dfs_restore_p2 <-  dfs_restore_p2 %>%
+  arrange(record_id)
+
+dfs_coh_p2 <-  dfs_coh_p2 %>%
+  arrange(record_id)
+
+
+
+
+
+# write the data to csv locally 
+
+write.csv(dfs_redi_p2,"../data/saliva/phase2/dfs_redi_p2_2_3_2023_data.csv", row.names = FALSE, na="")
+write.csv(dfs_rebound_p2,"../data/saliva/phase2/dfs_rebound_p2_2_3_2023_data.csv", row.names = FALSE, na="")
+write.csv(dfs_restore_p2,"../data/saliva/phase2/dfs_restore_p2_2_3_2023_data.csv", row.names = FALSE, na="")
+write.csv(dfs_coh_p2,"../data/saliva/phase2/dfs_coh_p2_2_3_2023_data.csv", row.names = FALSE, na="")
+
+
+# Write the data to REDCap with the redcapR package 
+# Read the dataset for the first time.
+# Restore
+result_read_restore_p2 <- REDCapR::redcap_read_oneshot(redcap_uri=uri, token=restore_p2_token,fields=c("record_id"))
+ds_restore_p2 <- result_read_restore_p2$data
+
+unique_orig_id_restore_p2 <- unique(ds_restore_p2$record_id)
+unique_import_ids_restore_p2 <- unique(dfs_restore_p2$record_id)
+
+matching_ids_restore<- ids_exist(unique_orig_id_restore_p2,unique_import_ids_restore_p2) #calling a function I created in another script 
+
+if (matching_ids_restore==TRUE){
+  result_write  <- REDCapR::redcap_write(dfs_restore_p2, redcap_uri=uri, token=restore_p2_token)
+}
+
+# REDI
+result_read_redi_p2 <- REDCapR::redcap_read_oneshot(redcap_uri=uri, token=redi_p2_token,fields=c("record_id"))
+ds_redi_p2 <- result_read_redi_p2$data
+
+unique_orig_id_redi_p2 <- unique(ds_redi_p2$record_id)
+unique_import_ids_redi_p2 <- unique(dfs_redi_p2$record_id)
+
+matching_ids_redi<- ids_exist(unique_orig_id_redi_p2,unique_import_ids_redi_p2) #calling a function I created in another script 
+
+if (matching_ids_redi==TRUE){
+  result_write  <- REDCapR::redcap_write(dfs_redi_p2, redcap_uri=uri, token=redi_p2_token)
+}
+
+
+# REBOUND
+result_read_rebound_p2 <- REDCapR::redcap_read_oneshot(redcap_uri=uri, token=rebound_p2_token,fields=c("record_id"))
+ds_rebound_p2 <- result_read_rebound_p2$data
+
+unique_orig_id_rebound_p2 <- unique(ds_rebound_p2$record_id)
+unique_import_ids_rebound_p2 <- unique(dfs_rebound_p2$record_id)
+
+matching_ids_rebound<- ids_exist(unique_orig_id_rebound_p2,unique_import_ids_rebound_p2) #calling a function I created in another script 
+
+if (matching_ids_rebound==TRUE){
+  result_write  <- REDCapR::redcap_write(dfs_rebound_p2, redcap_uri=uri, token=rebound_p2_token)
+}
+
+
+# COH
+result_read_coh_p2 <- REDCapR::redcap_read_oneshot(redcap_uri=uri, token=coh_token,fields=c("record_id"))
+ds_coh_p2 <- result_read_coh_p2$data
+
+unique_orig_id_coh_p2 <- unique(ds_coh_p2$record_id)
+unique_import_ids_coh_p2 <- unique(dfs_coh_p2$record_id)
+
+matching_ids_rebound<- ids_exist(unique_orig_id_coh_p2,unique_import_ids_coh_p2) #calling a function I created in another script 
+
+if (matching_ids_rebound==TRUE){
+  result_write  <- REDCapR::redcap_write(dfs_coh_p2, redcap_uri=uri, token=coh_token)
+}
+

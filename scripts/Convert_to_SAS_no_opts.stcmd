@@ -1,0 +1,7 @@
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MINDR/data/datasets/stata/nwef.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MINDR/data/datasets/SAS/nwef.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MINDR/data/datasets/stata/uvf.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MINDR/data/datasets/SAS/uvf.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MINDR/data/datasets/stata/psf.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MINDR/data/datasets/SAS/psf.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MINDR/data/datasets/stata/wef.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MINDR/data/datasets/SAS/wef.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MINDR/data/datasets/stata/woman.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MINDR/data/datasets/SAS/woman.sas7bdat"
+
+quit

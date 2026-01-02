@@ -1,0 +1,35 @@
+// This Stat/Transfer command file was automatically generated on November 18, 2019 at 3:08 PM (v11.2.2106.0521, Windows NT 6.2 (build 9200))
+//ENCODING UTF-8
+set numeric-names      n
+set log-level          w
+set in-encoding        system
+set out-encoding       system
+set enc-errors         sub
+set enc-sub-char       _
+set enc-error-limit    100
+set var-case-ci        preserve-always
+set preserve-label-sets y
+set preserve-str-widths n
+set date-fmt-write     "%m/%d/%Y"
+set time-fmt-write     "%0H:%0M:%0S"
+set datetime-fmt-write "%m/%d/%Y %0H:%0M:%0S"
+set num-miss-wr        none
+set write-sas-fmts     n
+set sas-outrep         windows_64
+set write-old-ver      18
+
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/stata/msaf1.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/SAS/msaf1.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/stata/mac.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/SAS/mac.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/stata/msaf.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/SAS/msaf.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/stata/nwef.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/SAS/nwef.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/stata/pef.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/SAS/pef.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/stata/psf.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/SAS/psf.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/stata/raf.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/SAS/raf.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/stata/ses.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/SAS/ses.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/stata/target_sector.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/SAS/target_sector.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/stata/wef.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/SAS/wef.sas7bdat"
+copy  "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/stata/woman.dta" sas9 "C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/jivita8/TargetBEP/Data/datasets/SAS/woman.sas7bdat"
+
+
+
+quit

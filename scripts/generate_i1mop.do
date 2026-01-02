@@ -1,0 +1,137 @@
+ cd "./"
+#delimit ;
+clear;
+/*i1mop*/
+set more off;
+/*set memory 700m;   removed 2024.05.14  */
+
+capture log close;
+log using "..\datasets\logs\i1mop.log", replace;
+odbc load,exec("
+SELECT
+uid,
+childuid,
+tlpin,
+sector,
+hhid,
+/*womname,*/
+/*childname,*/
+/*husbname,*/
+i1wkint,
+i1date,
+workerid,
+i1relat1,
+i1status,
+i1dod,
+i1pneum,
+i1pneumt,
+i1pneum7,
+i1diar,
+i1diart,
+i1diar7,
+i1dys,
+i1dyst,
+i1dys7,
+i1hfvr,
+i1hfvrt,
+i1hfvr7,
+i1bfed,
+i1bfedever,
+i1sbfed,
+i1sbfedd,
+i1sbfedw,
+i1bfhr,
+i1bfclst,
+i1bftime,
+i1bfsuff,
+i1edrop,
+i1edroph,
+i1eamilk,
+i1eamilkh,
+i1eswater,
+i1eswaterh,
+i1ewater,
+i1ewaterh,
+i1eghee,
+iegheeh,
+i1ehoney,
+i1ehoneyh,
+i1epmilk,
+i1epmilkh,
+i1eformu,
+i1eformuh,
+i1eothf,
+i1eothfs,
+i1eothfh,
+i1amilk,
+i1amilkd,
+i1amilkt,
+i1pmilk,
+i1pmilkd,
+i1pmilkt,
+i1omilk,
+i1omilkd,
+i1omilkt,
+i1formu,
+i1formud,
+i1formut,
+i1swater,
+i1swaterd,
+i1swatert,
+i1water,
+i1waterd,
+i1watert,
+i1honey,
+i1honeyd,
+i1honeyt,
+i1othf,
+i1othfs,
+i1othfd,
+i1othft,
+i1weight,
+i1muac1,
+i1muac2,
+i1muac3,
+i1cc1,
+i1cc2,
+i1cc3,
+i1hc1,
+i1hc2,
+i1hc3,
+i1height1,
+i1height2,
+i1height3,
+version,
+today,
+start,
+[end],
+hhchange,
+newhhid,
+idenconf,
+insert_time,
+update_time,
+inserted_by,
+updateed_by,
+_submission_time,
+_submitted_by,
+_date_modified,
+_xform_id,
+instanceid,
+_duration,
+_media_all_received,
+_media_count,
+_id,
+_uuid,
+_version,
+duplicate
+FROM     [mindr-live].dbo.i1mop_mv
+") dsn("rammps");
+
+fixdate i1date i1dod;
+
+#delimit cr
+
+save "..\datasets\stata\i1mop.dta", replace
+saveold "..\datasets\stata\i1mop.dta",replace version(12) 
+
+log close

@@ -1,0 +1,65 @@
+cd "./"
+
+
+do generate_aef_pw.do
+/*do generate_aef_wra.do -- no wra aef data*/
+do generate_bnf.do
+do generate_drf_pw.do
+do generate_drf_wra.do
+do generate_dvf_pw.do
+do generate_dvf_wra.do
+do generate_fbaf.do
+do generate_i1mop.do
+do generate_ibaf.do
+do generate_lab_proc_pw.do
+do generate_lab_proc_wra.do
+do generate_lab_proc.do
+do generate_lab_recv_pw.do
+do generate_lab_recv_wra.do
+do generate_lab_recv.do
+do generate_lab_store_pw.do
+do generate_lab_store_wra.do
+do generate_lab_store.do
+do generate_lpf_pw.do
+do generate_lpfb_pw.do
+do generate_m1mop_pw.do
+do generate_m1mopb_pw.do
+do generate_mbaf.do
+do generate_mpf_pw.do
+do generate_mpfb_pw.do
+do generate_nwef.do
+do generate_pef_pw.do
+do generate_pefb_pw.do
+do generate_pregtrak.do
+do generate_psf.do
+do generate_px_wra.do
+do generate_px_pw.do
+do generate_saf_pw.do
+do generate_saf_wra.do
+do generate_serf_pw.do
+do generate_ses_pw.do
+do generate_ses_wra.do
+do generate_sif_pw.do
+do generate_sif_wra.do
+do generate_suf_wra.do
+do generate_urf.do
+do generate_uvf.do
+do generate_wef_nwef.do
+do generate_wef.do
+do generate_wmf_pw.do
+do generate_wmf_wra.do
+do generate_woman_pw.do
+do generate_woman_wra.do
+do generate_woman.do
+do generate_wra_1b_wra.do
+do generate_wra_3b_wra.do
+do generate_wra_eb_wra.do
+do generate_wratrak.do
+do generate_wravf_e_wra.do
+do generate_wravf_f_wra.do
+do generate_wravf_m_wra.do
+//do generate_wtrak_pw.do
+//do generate_wtrak_wra.do
+
+do copy_stata_files_to_correct_trial.do
+exit

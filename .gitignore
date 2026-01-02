@@ -1,0 +1,9 @@
+datasets
+raw_data
+scripts/WomanTrak/LSI/data/*
+scripts/WomanTrak/LSI/indices_pw.csv
+scripts/WomanTrak/LSI/indices_wra.csv
+scripts/WomanTrak/ultrasound_ga_data
+scripts/WomanTrak/serf/
+scripts/dietary_recall
+scripts/WomanTrak/discontinued_20241130.csv
