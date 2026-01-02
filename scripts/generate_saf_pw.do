@@ -20,6 +20,7 @@ sadate,
 workerid,
 sastatus,
 sadoc,
+sadod,
 sadaydrink,
 sadawtwat,
 sadawata,
@@ -67,7 +68,6 @@ hhchange,
 newhhid,
 idenconf,
 sadawtwatc,
-sadod,
 /*insert_time,*/
 /*update_time,*/
 /*_submission_time,*/

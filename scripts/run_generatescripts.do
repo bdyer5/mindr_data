@@ -6,8 +6,6 @@ do generate_aef_pw.do
 do generate_bnf.do
 do generate_drf_pw.do
 do generate_drf_wra.do
-do generate_dvf_pw.do
-do generate_dvf_wra.do
 do generate_fbaf.do
 do generate_i1mop.do
 do generate_ibaf.do
@@ -31,6 +29,7 @@ do generate_nwef.do
 do generate_pef_pw.do
 do generate_pefb_pw.do
 do generate_pregtrak.do
+do generate_pregtrak_times.do
 do generate_psf.do
 do generate_px_wra.do
 do generate_px_pw.do

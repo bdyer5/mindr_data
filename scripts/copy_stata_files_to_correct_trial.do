@@ -31,6 +31,7 @@ copy "`source_path'/pef_pw.dta" "`pw_path'" ,replace
 copy "`source_path'/pefb_pw.dta" "`pw_path'" ,replace
 copy "`source_path'/psf.dta" "`pw_path'" ,replace
 copy "`source_path'/pregtrak.dta" "`pw_path'" ,replace
+copy "`source_path'/pregtrak_times.dta" "`pw_path'" ,replace
 copy "`source_path'/px_pw.dta" "`pw_path'" ,replace
 copy "`source_path'/px_wra.dta" "`wra_path'" ,replace
 copy "`source_path'/saf_pw.dta" "`pw_path'" ,replace

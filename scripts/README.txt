@@ -40,7 +40,11 @@ SAF - 1 change made in the DB
 17. run create flow diagram wra
 
 
--- note: 20250804 
-I think I need to repull data , especially for : 
-WEF NWEF - lots of nwe marry dates repulled 
-SAF - 1 change made in the DB 
+--20260102 
+1. restored mindr_live_20250925_20251028.7z
+2. run scripts\run_generatescripts.do
+3. now compare with the posted version on Sharepoint. 
+    - copy sharepoint dta folders to datasets folder 
+    - run files in crosscheck_dta_files against the posted dataset.
+    - note: all match except for some woman child husband names that were removed.
+
