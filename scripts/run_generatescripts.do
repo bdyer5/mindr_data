@@ -6,6 +6,8 @@ do generate_aef_pw.do
 do generate_bnf.do
 do generate_drf_pw.do
 do generate_drf_wra.do
+do generate_dvf_pw.do
+do generate_dvf_wra.do
 do generate_fbaf.do
 do generate_i1mop.do
 do generate_ibaf.do

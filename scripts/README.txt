@@ -41,6 +41,7 @@ SAF - 1 change made in the DB
 
 
 --20260102 
+-- using the most recent data freeze
 1. restored mindr_live_20250925_20251028.7z
 2. run scripts\run_generatescripts.do
 3. now compare with the posted version on Sharepoint. 
@@ -48,3 +49,11 @@ SAF - 1 change made in the DB
     - run files in crosscheck_dta_files against the posted dataset.
     - note: all match except for some woman child husband names that were removed.
 
+
+-- 20260102 
+-- using the most current DB 
+1. restore DB
+--2. removed mindr_pw_compliance_20241015 reference from flow diagram Create_flow_diagram_pw_Followup__20250925_20260102.sql
+3. add mindr_ga from C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts\WomanTrak\ultrasound_ ga_data\20250603\mindr_ga_20250603.csv
+4. C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts\WomanTrak\LSI\indices_pw 
+5. C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts\WomanTrak\LSI\indices_wra
