@@ -6,7 +6,7 @@ set more off;
 set memory 700m;
 
 capture log close;
-log using "..\datasets\logs\suf_wra.log", replace;
+log using "..\datasets\logs\suf_pw.log", replace;
 odbc load,exec("
 select
 uid,
@@ -72,13 +72,14 @@ _xform_id,
 duplicate,
 id,
 insert_time,
+inserted_by,
 instance_id,
 hhchange,
 newhhid,
 idenconf,
 update_time,
 updateed_by
-FROM [mindr-live].dbo.suf_wra_mv
+FROM [mindr-live].dbo.suf_pw_mv
 ") dsn("rammps");
 
 fixdate sudate suudt suupudt suddef susbkcb;
@@ -86,6 +87,6 @@ fixdate sudate suudt suupudt suddef susbkcb;
 #delimit cr
 
 
-save "..\datasets\stata\suf_wra.dta", replace
-saveold "..\datasets\stata\suf_wra.dta", replace version(12)
+save "..\datasets\stata\suf_pw.dta", replace
+saveold "..\datasets\stata\suf_pw.dta", replace version(12)
 log close

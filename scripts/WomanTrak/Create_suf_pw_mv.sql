@@ -2,13 +2,13 @@ use [mindr-live]
 go 
 
 
-if exists(select o.name from sysobjects o where o.name='suf_wra_mv')
+if exists(select o.name from sysobjects o where o.name='suf_pw_mv')
 begin 
-drop view suf_wra_mv 
+drop view suf_pw_mv 
 end 
 go 
 
-create view suf_wra_mv 
+create view suf_pw_mv 
 as 
 
 select
@@ -19,11 +19,11 @@ sector,
 hhid,
 womname,
 husbname,
-CONVERT(smalldatetime, su.sudate, 121) as sudate,
+convert(smalldatetime,su.sudate,121) as sudate,
 workerid,
 sustatus,
 suvisit,
-convert(smalldatetime,su.sudod,121) as sudod,
+convert(smalldatetime,sudod,121) as sudod,
 suucol,
 sufrsturin,
 suebcu,
@@ -53,8 +53,8 @@ today,
 start,
 [end],
 schedule_id as scheduleid,
-case when suucolres ='null' then null else suucolres end as suucolres,
-case when suscolres ='null' then null else suscolres end as suscolres,
+suucolres,
+suscolres,
 /*st,*/
 vt,
 supt,
@@ -77,21 +77,21 @@ _xform_id,
 duplicate,
 id,
 insert_time,
+inserted_by,
 instance_id,
 hhchange,
 newhhid,
 idenconf,
 update_time,
 updateed_by
-FROM [mindr-live].dbo.all_suf_wra su
-
+FROM [mindr-live].dbo.all_suf_pw su
 left join 
 ----
 (select b.uid,b.formorder,b.sudate,max(b._submission_time) _submission_time
-from (select rb1.uid,rb1.formorder,convert(smalldatetime,rb1.sudate,121) as sudate,_submission_time from [mindr-live].dbo.all_suf_wra rb1
+from (select rb1.uid,rb1.formorder,convert(smalldatetime,rb1.sudate,121) as sudate,_submission_time from [mindr-live].dbo.all_suf_pw rb1
 left join (select rb2.uid,rb2.formorder, max(convert(smalldatetime,sudate,121)) sudate 
-from [mindr-live].dbo.all_suf_wra rb2
-where duplicate is null
+from [mindr-live].dbo.all_suf_pw rb2
+where duplicate is null -- and _id!=168558037 -- 532689 woman who did not get met for a swab and not met was entered after met visit , so keeping the status =1 
 group by rb2.uid,rb2.formorder) a on a.uid = rb1.uid  and rb1.formorder=a.formorder and  convert(smalldatetime,rb1.sudate,121) =a.sudate where a.sudate is not null
 and rb1.duplicate is null  --1166
 ) b group by b.uid,b.formorder,b.sudate) c on c.uid = su.uid and c.formorder = su.formorder  and c.sudate = su.sudate and c._submission_time = su._submission_time 

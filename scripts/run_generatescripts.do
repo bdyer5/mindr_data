@@ -42,6 +42,7 @@ do generate_ses_pw.do
 do generate_ses_wra.do
 do generate_sif_pw.do
 do generate_sif_wra.do
+do generate_suf_pw.do
 do generate_suf_wra.do
 do generate_urf.do
 do generate_uvf.do

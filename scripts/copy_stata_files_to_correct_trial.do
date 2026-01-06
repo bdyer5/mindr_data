@@ -42,6 +42,7 @@ copy "`source_path'/ses_pw.dta" "`pw_path'" ,replace
 copy "`source_path'/ses_wra.dta" "`wra_path'" ,replace
 copy "`source_path'/sif_pw.dta" "`pw_path'" ,replace
 copy "`source_path'/sif_wra.dta" "`wra_path'" ,replace
+copy "`source_path'/suf_pw.dta" "`wra_path'" ,replace
 copy "`source_path'/suf_wra.dta" "`wra_path'" ,replace
 copy "`source_path'/urf.dta" "`pw_path'" ,replace
 copy "`source_path'/uvf.dta" "`pw_path'" ,replace

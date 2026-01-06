@@ -65,7 +65,7 @@ fixdate sidate;
 foreach v of varlist si* {
      if !inlist("`v'", "sidate","sisaltstores") {
 	    replace `v' = "" if (`v' == "n/a" )
-        destring `v', force replace
+        //destring `v', force replace
      }
 }
 
