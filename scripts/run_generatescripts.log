@@ -49,7 +49,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\aef_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:02
+ opened on:  22 Jan 2026, 10:56:19
 
 . odbc load,exec("
 > SELECT
@@ -57,11 +57,8 @@ delimiter now ;
 > tlpin,
 > sector,
 > hhid,
-> hhchange,
-> newhhid,
 > womname,
 > husbname,
-> idenconf,
 > aefdate,
 > workerid,
 > aeperson,
@@ -86,6 +83,9 @@ delimiter now ;
 > today,
 > start,
 > [end],
+> hhchange,
+> newhhid,
+> idenconf,
 > insert_time,
 > update_time,
 > _submission_time,
@@ -108,7 +108,12 @@ delimiter now cr
 . //Calculate the number of splits needed
 . local max_length_an = 242
 
-. local num_splits_an = ceil(strlen(aedescpt) / `max_length_an')+1
+. egen max_str_len = max(strlen(aedescpt))
+
+. local num_splits_an = ceil(max_str_len[1]/ `max_length_an')
+
+. 
+. drop max_str_len
 
 . 
 . //Create new variables to hold the splits
@@ -118,6 +123,8 @@ delimiter now cr
   3.     order aedescpt`i', before(aedescpt)
   4. }
 (1 missing value generated)
+(4 missing values generated)
+(15 missing values generated)
 
 . 
 . 
@@ -127,8 +134,14 @@ delimiter now cr
 . //Calculate the number of splits needed
 . local max_length_an = 242
 
-. local num_splits_an = ceil(strlen(aefevntsum) / `max_length_an')+1
+. egen max_str_len = max(strlen(aefevntsum))
 
+. local num_splits_an = ceil(max_str_len[1]/ `max_length_an')
+
+. 
+. drop max_str_len
+
+. 
 . 
 . //Create new variables to hold the splits
 . forval i = 1/`num_splits_an' {
@@ -158,7 +171,7 @@ file ..\datasets\stata\aef_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\aef_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:02
+ closed on:  22 Jan 2026, 10:56:19
 -------------------------------------------------------------------------------
 
 . 
@@ -187,7 +200,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\bnf.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:02
+ opened on:  22 Jan 2026, 10:56:19
 
 . odbc load,exec("
 > SELECT
@@ -253,7 +266,7 @@ file ..\datasets\stata\bnf.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\bnf.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:02
+ closed on:  22 Jan 2026, 10:56:19
 -------------------------------------------------------------------------------
 
 . 
@@ -281,7 +294,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\drf.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:02
+ opened on:  22 Jan 2026, 10:56:19
 
 . odbc load,exec("
 > select 
@@ -391,7 +404,7 @@ drfoodcons: contains nonnumeric characters; replaced as double
 
     Variable |        Obs        Mean    Std. dev.       Min        Max
 -------------+---------------------------------------------------------
-        _len |     14,033    .2023088    1.608811          0         55
+        _len |     14,033     .223402    1.850965          0         76
 
 . local maxlen = r(max)
 
@@ -420,11 +433,14 @@ drfoodcons: contains nonnumeric characters; replaced as double
 . replace drvstype_num = 1 if inlist(drvstype, "baseline_visit")
 (4,130 real changes made)
 
-. replace drvstype_num = 2 if inlist(drvstype, "replicate_visit")
-(0 real changes made)
+. replace drvstype_num = 2 if inlist(drvstype, "midline_visit")
+(3,382 real changes made)
 
-. replace drvstype_num = 3 if inlist(drvstype, "endline_visit")
-(0 real changes made)
+. replace drvstype_num = 3 if inlist(drvstype, "lpf_visit")
+(3,341 real changes made)
+
+. replace drvstype_num = 4 if inlist(drvstype, "m1mop_visit")
+(3,180 real changes made)
 
 . drop drvstype
 
@@ -556,7 +572,7 @@ file ..\datasets\stata\drf_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\drf.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:06
+ closed on:  22 Jan 2026, 10:56:22
 -------------------------------------------------------------------------------
 
 . 
@@ -584,7 +600,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\drf.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:06
+ opened on:  22 Jan 2026, 10:56:22
 
 . odbc load,exec("
 > select 
@@ -695,7 +711,7 @@ drfoodcons: contains nonnumeric characters; replaced as double
 
     Variable |        Obs        Mean    Std. dev.       Min        Max
 -------------+---------------------------------------------------------
-        _len |      6,218     .170312    1.724775          0         47
+        _len |      6,218    .1687038    1.663894          0         28
 
 . local maxlen = r(max)
 
@@ -856,7 +872,347 @@ file ..\datasets\stata\drf_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\drf.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:07
+ closed on:  22 Jan 2026, 10:56:24
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_dvf_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*dvf_pw*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\dvf_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\dvf_pw.log
+  log type:  text
+ opened on:  22 Jan 2026, 10:56:24
+
+. odbc load,exec("
+> select 
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> /*womname,*/
+> /*husbname,*/
+> dvfdate,
+> workerid,
+> visittype,
+> visitstatus,
+> disdone,
+> dissupp,
+> referal,
+> hhchange,
+> newhhid,
+> idenconf,
+> today,
+> start,
+> [end],
+> version,
+> scheduleid,
+> _date_modified,
+> _duration,
+> _id,
+> _media_all_received,
+> _media_count,
+> _submission_time,
+> _submitted_by,
+> _total_media,
+> _uuid,
+> _version,
+> _xform_id,
+> duplicate,
+> id,
+> insert_time,
+> inserted_by,
+> instance_id,
+> update_time,
+> updateed_by
+> from [mindr-live].dbo.dvf_pw_mv d
+> ") dsn("rammps");
+
+. fixdate dvfdate;
+(113 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. 
+. foreach v of varlist * {
+  2.      if !inlist("`v'", "dvfdate","insert_time","inserted_by","update_time"
+> ,"updateed_by") {
+  3.         di `v'
+  4.             replace `v' = "" if (`v' == "n/a" )
+  5.         //destring `v', force replace
+.      }
+  6. }
+814611
+(0 real changes made)
+19
+(0 real changes made)
+247
+(0 real changes made)
+2274
+(0 real changes made)
+0528
+(0 real changes made)
+3
+(0 real changes made)
+1
+(0 real changes made)
+1
+(0 real changes made)
+
+(0 real changes made)
+
+(0 real changes made)
+
+(0 real changes made)
+
+(0 real changes made)
+1
+(0 real changes made)
+2023-12-13
+(0 real changes made)
+2023-12-13T11:44:18.710+06:00
+(0 real changes made)
+2023-12-13T11:44:45.591+06:00
+(0 real changes made)
+1.1
+(0 real changes made)
+18846
+(0 real changes made)
+2023-12-13T05:44:46.521275+00:00
+(0 real changes made)
+27.0
+(0 real changes made)
+127749535
+(0 real changes made)
+true
+(0 real changes made)
+0
+(0 real changes made)
+2023-12-13T05:44:46.478079+00:00
+(0 real changes made)
+
+(0 real changes made)
+0
+(0 real changes made)
+57eb5562-62f1-41af-bb99-f76118196879
+(0 real changes made)
+202311220906
+(0 real changes made)
+776510
+(0 real changes made)
+
+(0 real changes made)
+1
+(0 real changes made)
+uuid:57eb5562-62f1-41af-bb99-f76118196879
+(0 real changes made)
+
+. 
+. 
+. save "..\datasets\stata\dvf_pw.dta", replace
+file ..\datasets\stata\dvf_pw.dta saved
+
+. saveold "..\datasets\stata\dvf_pw.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\dvf_pw.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\dvf_pw.log
+  log type:  text
+ closed on:  22 Jan 2026, 10:56:24
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_dvf_wra.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*dvf_wra*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\dvf_wra.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\dvf_wra.log
+  log type:  text
+ opened on:  22 Jan 2026, 10:56:24
+
+. odbc load,exec("
+> select 
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> /*womname,*/
+> /*husbname,*/
+> dvfdate,
+> workerid,
+> visittype,
+> visitstatus,
+> disdone,
+> dissupp,
+> referal,
+> idenconf,
+> hhchange,
+> newhhid,
+> today,
+> start,
+> [end],
+> version,
+> scheduleid,
+> _date_modified,
+> _duration,
+> _id,
+> _media_all_received,
+> _media_count,
+> _submission_time,
+> _submitted_by,
+> _total_media,
+> _uuid,
+> _version,
+> _xform_id,
+> duplicate,
+> id,
+> insert_time,
+> inserted_by,
+> instance_id,
+> update_time,
+> updateed_by
+> from [mindr-live].dbo.dvf_wra_mv d
+> ") dsn("rammps");
+
+. fixdate dvfdate;
+(65 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. 
+. foreach v of varlist * {
+  2.      if !inlist("`v'", "dvfdate","insert_time","inserted_by","update_time"
+> ,"updateed_by") {
+  3.         di `v'
+  4.             replace `v' = "" if (`v' == "n/a" )
+  5.         //destring `v', force replace
+.      }
+  6. }
+731598
+(0 real changes made)
+19
+(0 real changes made)
+247
+(0 real changes made)
+2378
+(0 real changes made)
+0527
+(0 real changes made)
+1
+(0 real changes made)
+1
+(0 real changes made)
+1
+(0 real changes made)
+
+(0 real changes made)
+
+(0 real changes made)
+1
+(0 real changes made)
+
+(0 real changes made)
+
+(0 real changes made)
+2024-03-19
+(0 real changes made)
+2024-03-19T10:35:16.649+06:00
+(0 real changes made)
+2024-03-19T10:44:32.758+06:00
+(0 real changes made)
+1.1
+(0 real changes made)
+12485
+(0 real changes made)
+2024-03-19T04:44:34.795446+00:00
+(0 real changes made)
+556.0
+(0 real changes made)
+133941986
+(0 real changes made)
+true
+(0 real changes made)
+0
+(0 real changes made)
+2024-03-19T04:44:34.760192+00:00
+(0 real changes made)
+
+(0 real changes made)
+0
+(0 real changes made)
+215e6894-5893-4359-a71f-9386c697533c
+(0 real changes made)
+202403111105
+(0 real changes made)
+793154
+(0 real changes made)
+
+(0 real changes made)
+1
+(0 real changes made)
+uuid:215e6894-5893-4359-a71f-9386c697533c
+(0 real changes made)
+
+. 
+. 
+. save "..\datasets\stata\dvf_wra.dta", replace
+file ..\datasets\stata\dvf_wra.dta saved
+
+. saveold "..\datasets\stata\dvf_wra.dta",replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\dvf_wra.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\dvf_wra.log
+  log type:  text
+ closed on:  22 Jan 2026, 10:56:24
 -------------------------------------------------------------------------------
 
 . 
@@ -884,7 +1240,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\fbaf.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:07
+ opened on:  22 Jan 2026, 10:56:24
 
 . odbc load,exec("
 > SELECT
@@ -975,7 +1331,7 @@ file ..\datasets\stata\fbaf.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\fbaf.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:07
+ closed on:  22 Jan 2026, 10:56:24
 -------------------------------------------------------------------------------
 
 . 
@@ -1003,7 +1359,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\i1mop.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:07
+ opened on:  22 Jan 2026, 10:56:24
 
 . odbc load,exec("
 > SELECT
@@ -1012,9 +1368,9 @@ delimiter now ;
 > tlpin,
 > sector,
 > hhid,
-> womname,
-> childname,
-> husbname,
+> /*womname,*/
+> /*childname,*/
+> /*husbname,*/
 > i1wkint,
 > i1date,
 > workerid,
@@ -1145,7 +1501,7 @@ file ..\datasets\stata\i1mop.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\i1mop.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:08
+ closed on:  22 Jan 2026, 10:56:24
 -------------------------------------------------------------------------------
 
 . 
@@ -1173,7 +1529,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\ibaf.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:08
+ opened on:  22 Jan 2026, 10:56:24
 
 . odbc load,exec("
 > SELECT
@@ -1288,7 +1644,7 @@ file ..\datasets\stata\ibaf.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\ibaf.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:08
+ closed on:  22 Jan 2026, 10:56:24
 -------------------------------------------------------------------------------
 
 . 
@@ -1316,7 +1672,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_proc_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:08
+ opened on:  22 Jan 2026, 10:56:24
 
 . odbc load,exec("
 > SELECT
@@ -1358,7 +1714,7 @@ file ..\datasets\stata\lab_proc_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_proc_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:08
+ closed on:  22 Jan 2026, 10:56:25
 -------------------------------------------------------------------------------
 
 . 
@@ -1386,7 +1742,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_proc_wra.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:08
+ opened on:  22 Jan 2026, 10:56:25
 
 . odbc load,exec("
 > SELECT
@@ -1428,7 +1784,7 @@ file ..\datasets\stata\lab_proc_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_proc_wra.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:08
+ closed on:  22 Jan 2026, 10:56:25
 -------------------------------------------------------------------------------
 
 . 
@@ -1456,7 +1812,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_proc.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:08
+ opened on:  22 Jan 2026, 10:56:25
 
 . odbc load,exec("
 > SELECT
@@ -1496,7 +1852,7 @@ file ..\datasets\stata\lab_proc.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_proc.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:08
+ closed on:  22 Jan 2026, 10:56:25
 -------------------------------------------------------------------------------
 
 . 
@@ -1524,7 +1880,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_recv_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:08
+ opened on:  22 Jan 2026, 10:56:25
 
 . odbc load,exec("
 > SELECT
@@ -1564,7 +1920,7 @@ file ..\datasets\stata\lab_recv_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_recv_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:09
+ closed on:  22 Jan 2026, 10:56:25
 -------------------------------------------------------------------------------
 
 . 
@@ -1592,7 +1948,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_recv_wra.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:09
+ opened on:  22 Jan 2026, 10:56:25
 
 . odbc load,exec("
 > SELECT
@@ -1632,7 +1988,7 @@ file ..\datasets\stata\lab_recv_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_recv_wra.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:09
+ closed on:  22 Jan 2026, 10:56:25
 -------------------------------------------------------------------------------
 
 . 
@@ -1660,7 +2016,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_recv.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:09
+ opened on:  22 Jan 2026, 10:56:25
 
 . odbc load,exec("
 > SELECT
@@ -1699,7 +2055,7 @@ file ..\datasets\stata\lab_recv.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_recv.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:09
+ closed on:  22 Jan 2026, 10:56:25
 -------------------------------------------------------------------------------
 
 . 
@@ -1727,7 +2083,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_store_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:09
+ opened on:  22 Jan 2026, 10:56:25
 
 . odbc load,exec("
 > SELECT
@@ -1765,7 +2121,7 @@ file ..\datasets\stata\lab_store_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_store_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:09
+ closed on:  22 Jan 2026, 10:56:26
 -------------------------------------------------------------------------------
 
 . 
@@ -1793,7 +2149,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_store_wra.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:09
+ opened on:  22 Jan 2026, 10:56:26
 
 . odbc load,exec("
 > SELECT
@@ -1831,7 +2187,7 @@ file ..\datasets\stata\lab_store_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_store_wra.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:10
+ closed on:  22 Jan 2026, 10:56:26
 -------------------------------------------------------------------------------
 
 . 
@@ -1859,7 +2215,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_store.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:10
+ opened on:  22 Jan 2026, 10:56:26
 
 . odbc load,exec("
 > SELECT
@@ -1895,7 +2251,7 @@ file ..\datasets\stata\lab_store.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lab_store.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:10
+ closed on:  22 Jan 2026, 10:56:26
 -------------------------------------------------------------------------------
 
 . 
@@ -1926,7 +2282,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lpf_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:10
+ opened on:  22 Jan 2026, 10:56:26
 
 . odbc load,exec("
 > select
@@ -2152,7 +2508,7 @@ file ..\datasets\stata\lpf_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lpf_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:10
+ closed on:  22 Jan 2026, 10:56:26
 -------------------------------------------------------------------------------
 
 . 
@@ -2183,7 +2539,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lpfb_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:10
+ opened on:  22 Jan 2026, 10:56:26
 
 . odbc load,exec("
 > select 
@@ -2338,7 +2694,7 @@ file ..\datasets\stata\lpfb_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\lpfb_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:10
+ closed on:  22 Jan 2026, 10:56:26
 -------------------------------------------------------------------------------
 
 . 
@@ -2369,7 +2725,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\m1mop_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:10
+ opened on:  22 Jan 2026, 10:56:26
 
 . odbc load,exec("
 > select 
@@ -2528,7 +2884,7 @@ file ..\datasets\stata\m1mop_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\m1mop_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:12
+ closed on:  22 Jan 2026, 10:56:28
 -------------------------------------------------------------------------------
 
 . 
@@ -2559,7 +2915,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\m1mopb_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:12
+ opened on:  22 Jan 2026, 10:56:28
 
 . odbc load,exec("
 > select 
@@ -2728,7 +3084,7 @@ file ..\datasets\stata\m1mopb_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\m1mopb_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:14
+ closed on:  22 Jan 2026, 10:56:30
 -------------------------------------------------------------------------------
 
 . 
@@ -2757,7 +3113,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\mbaf.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:14
+ opened on:  22 Jan 2026, 10:56:30
 
 . odbc load,exec("
 > SELECT
@@ -2862,11 +3218,11 @@ delimiter now ;
 > ") dsn("rammps");
 
 . fixdate mbdate;
-(293 real changes made)
+(295 real changes made)
 
 . destring mbweight, force replace;
 mbweight: all characters numeric; replaced as double
-(34 missing values generated)
+(36 missing values generated)
 
 . #delimit cr
 delimiter now cr
@@ -2891,7 +3247,7 @@ file ..\datasets\stata\mbaf.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\mbaf.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:14
+ closed on:  22 Jan 2026, 10:56:30
 -------------------------------------------------------------------------------
 
 . 
@@ -2922,7 +3278,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\mpf_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:14
+ opened on:  22 Jan 2026, 10:56:30
 
 . odbc load,exec("
 > select
@@ -3104,7 +3460,7 @@ file ..\datasets\stata\mpf_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\mpf_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:14
+ closed on:  22 Jan 2026, 10:56:30
 -------------------------------------------------------------------------------
 
 . 
@@ -3135,7 +3491,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\mpfb_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:14
+ opened on:  22 Jan 2026, 10:56:30
 
 . odbc load,exec("
 > select 
@@ -3289,7 +3645,7 @@ file ..\datasets\stata\mpfb_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\mpfb_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:16
+ closed on:  22 Jan 2026, 10:56:32
 -------------------------------------------------------------------------------
 
 . 
@@ -3320,7 +3676,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\nwef.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:16
+ opened on:  22 Jan 2026, 10:56:32
 
 . odbc load,exec("
 > select 
@@ -3443,7 +3799,7 @@ file ..\datasets\stata\nwef.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\nwef.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:16
+ closed on:  22 Jan 2026, 10:56:32
 -------------------------------------------------------------------------------
 
 . 
@@ -3471,7 +3827,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\pef_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:16
+ opened on:  22 Jan 2026, 10:56:32
 
 . odbc load,exec("
 > select
@@ -3838,7 +4194,7 @@ file ..\datasets\stata\pef_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\pef_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:16
+ closed on:  22 Jan 2026, 10:56:32
 -------------------------------------------------------------------------------
 
 . 
@@ -3866,7 +4222,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\pefb_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:16
+ opened on:  22 Jan 2026, 10:56:32
 
 . odbc load,exec("
 > select 
@@ -4052,7 +4408,7 @@ file ..\datasets\stata\pefb_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\pefb_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:17
+ closed on:  22 Jan 2026, 10:56:32
 -------------------------------------------------------------------------------
 
 . 
@@ -4080,7 +4436,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\pregtrak.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:17
+ opened on:  22 Jan 2026, 10:56:33
 
 . odbc load,exec("SELECT
 > uid,
@@ -4225,7 +4581,7 @@ delimiter now ;
 (418 real changes made)
 (342 real changes made)
 (661 real changes made)
-(293 real changes made)
+(295 real changes made)
 (300 real changes made)
 (290 real changes made)
 (354 real changes made)
@@ -4246,7 +4602,227 @@ file ..\datasets\stata\pregtrak.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\pregtrak.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:17
+ closed on:  22 Jan 2026, 10:56:33
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_pregtrak_times.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*p_test*/
+> set more off;
+
+. /*set memory 700m;   removed 2024.05.14  */
+> 
+> capture log close;
+
+. log using "..\datasets\logs\p_test.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\p_test.log
+  log type:  text
+ opened on:  22 Jan 2026, 10:56:33
+
+. odbc load,exec("SELECT
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> /*woman_status,*/
+> bgdob as wom_dob,
+> /*age,*/
+> age_pef,
+> age_wef,
+> allocated_arm as arm_pw,
+> /*age_grp,*/
+> /*dobyy,*/
+> /*dobdd,*/
+> /*dobmm,*/
+> /*convert(smalldatetime,dod,121) as wom_dod, -- ez said no deaths is this tru
+> e ?  - create a dod var to catch these*/ 
+> /*pef_eligable,*/
+> /*pef_eligible,*/
+> /*pef_status,*/
+> peconsent as pef_consent,
+> pedate as pef_date,
+> pefstatus as pef_status,
+> /*convert(smalldatetime,pef_done_date,121) as pef_done_date,*/
+> /*pef_consent,*/
+> /*convert(smalldatetime,pefb_done_date,121) as pefb_date,*/
+> /*pefb_status,*/
+> peb_date,
+> peb_time,
+> peb_meal_time,
+> peb_fast_time ,
+> peb_status,
+> /*psfstatus as psf_status,*/
+> /*psf_date,*/
+> /*last_psf_status,*/
+> /*last_psf_date,*/
+> /*psfurt,*/
+> psfurt_date as urtpos_psf,
+> /*ga_at_psfurt as ga_psf,*/
+> /*psflmp as lmp_psf, -- excluded 20250604*/
+> /*convert(smalldatetime,psf_done_date,121) as psf_done_date,*/
+> /*psf_eligable,*/
+> /*convert(smalldatetime,psf_lmp_date,121) as psf_lmp_date,*/
+> /*psf_status,*/
+> /*psf_urt,*/
+> /*convert(smalldatetime,saf_done_date,121) as saf_done_date,*/
+> /*saf_past_order,*/
+> /*saf_status,*/
+> /*safdate,*/
+> /*last_safstatus,*/
+> /*convert(smalldatetime,last_safdate,121) as saf_date,*/
+> /*safstatus as saf_status,*/
+> /*uvf_done_date as uvf_date,*/
+> /* excluded these 20250604 below*/
+> /*uvf_status,*/
+> /*uvf_ga,*/
+> /*uvf_lmp_date,*/
+> /*lmp_us,*/
+> /*ga_us,*/
+> bglmp,
+> bglmpru,
+> /*bgga_dy,*/
+> bgga,
+> bgoutc as outc,
+> /*bgoutcru as outcru,*/
+> bgoutcsrc as outcsrc,
+> /*bgwoutc as woutc,*/
+> bgdoutc as outcd,
+> parity,
+> gravidity,
+> lsi,
+> /*supp_status,*/
+> saf_flow_status as ever_supp,
+> /*convert(smalldatetime,ses_done_date,121) as ses_date,*/
+> /*ses_status,*/
+> convert(smalldatetime,mpf_done_date,121) as mp_date,
+> mpf_status as mp_status,
+> mpb_date,
+> mpb_time,
+> mpb_meal_time,
+> mpb_fast_time,
+> mpb_status,
+> mid_preg_status,
+> lpfdate as lp_date,
+> lpfstatus as lp_status,
+> lpb_date,
+> lpb_time,
+> lpb_meal_time,
+> lpb_fast_time,
+> lpb_status,
+> late_preg_status,
+> bnfdate as bnf_date,
+> /*convert(smalldatetime,bnf_done_date,121) as bnf_date,*/
+> /*bnf_status,*/
+> /*bnfstatus,*/
+> /*convert(smalldatetime,fbaf_done_date,121) as fbaf_date,*/
+> /*fbaf_status,*/
+> /*convert(smalldatetime,ibaf_done_date,121) as ibaf_date,*/
+> /*ibaf_status,*/
+> /*convert(smalldatetime,mbaf_done_date,121) as mbaf_date,*/
+> /*mbaf_status,*/
+> mbafdate as mbaf_date ,
+> mbafstatus as mbaf_status,
+> /*convert(smalldatetime,i1mop_done_date,121) as i1mop_date,*/
+> /*i1mop_status,*/
+> convert(smalldatetime,m1mop_done_date,121) as m1mop_date,
+> m1mop_status,
+> m1b_date,
+> m1b_time,
+> m1b_meal_time,
+> m1b_fast_time,
+> m1b_status
+> /*convert(smalldatetime,mopb_done_date,121) as mopb_date,*/
+> /*mopb_status,*/
+> /*convert(smalldatetime,outcome_date,121) as outcome_date,*/
+> /*outcome_status,*/
+> /*mpf_ga,*/
+> /*lmp_status,*/
+> /*chld1vitsts,*/
+> /*chld2vitsts,*/
+> /*chld3vitsts,*/
+> /*bgdoutcru as doutcru*/
+> /*fdose_date,*/
+> /*edose_date,*/
+> /*totdose_days,*/
+> /*totdose_mns,*/
+> /*totdose_bep,*/
+> /*pcomp_mns,*/
+> /*pcomp_bep*/
+> FROM [mindr-live].dbo.wtrak_pw") dsn("rammps");
+
+. fixdate wom_dob bnf_date lp_date lpb_date m1mop_date mp_date mpb_date pef_dat
+> e peb_date urtpos_psf mbaf_date outcd m1b_date bglmp;
+(3,999 real changes made)
+(294 real changes made)
+(278 real changes made)
+(263 real changes made)
+(292 real changes made)
+(278 real changes made)
+(272 real changes made)
+(418 real changes made)
+(342 real changes made)
+(661 real changes made)
+(295 real changes made)
+(300 real changes made)
+(290 real changes made)
+(354 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. /* Convert all %tc variables to SAS-friendly seconds and add a readable forma
+> t*/
+. quietly ds, has(format %tc*)
+
+. local tcvars `r(varlist)'
+
+. 
+. foreach v of local tcvars {
+  2.     gen double `v'_sasdt = floor(`v'/1000)
+  3.     label var `v'_sasdt "SAS datetime seconds from `v'"
+  4.         order `v'_sasdt ,after(`v')
+  5.         drop `v'
+  6.         rename `v'_sasdt `v'
+  7.     * Keep original as-is; recipient will apply DATETIME20. format in SAS
+. }
+(3,662 missing values generated)
+(3,662 missing values generated)
+(3,730 missing values generated)
+(3,730 missing values generated)
+(3,738 missing values generated)
+(3,738 missing values generated)
+(3,712 missing values generated)
+(3,712 missing values generated)
+
+. 
+. 
+. save "..\datasets\stata\pregtrak_times.dta", replace
+file ..\datasets\stata\pregtrak_times.dta saved
+
+. saveold "..\datasets\stata\pregtrak_times.dta",replace version(12) 
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\pregtrak_times.dta saved
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\p_test.log
+  log type:  text
+ closed on:  22 Jan 2026, 10:56:33
 -------------------------------------------------------------------------------
 
 . 
@@ -4277,7 +4853,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\psf.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:17
+ opened on:  22 Jan 2026, 10:56:33
 
 . odbc load,exec("
 > select
@@ -4351,7 +4927,7 @@ file ..\datasets\stata\psf.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\psf.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:18
+ closed on:  22 Jan 2026, 10:56:34
 -------------------------------------------------------------------------------
 
 . 
@@ -4379,7 +4955,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\px_wra.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:18
+ opened on:  22 Jan 2026, 10:56:34
 
 . odbc load,exec("
 > 
@@ -4438,7 +5014,7 @@ file ..\datasets\stata\px_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\px_wra.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:20
+ closed on:  22 Jan 2026, 10:56:36
 -------------------------------------------------------------------------------
 
 . 
@@ -4466,7 +5042,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\px_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:20
+ opened on:  22 Jan 2026, 10:56:36
 
 . odbc load,exec("
 > select
@@ -4524,7 +5100,7 @@ file ..\datasets\stata\px_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\px_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:21
+ closed on:  22 Jan 2026, 10:56:37
 -------------------------------------------------------------------------------
 
 . 
@@ -4555,7 +5131,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\saf_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:21
+ opened on:  22 Jan 2026, 10:56:37
 
 . odbc load,exec("
 > select 
@@ -4563,9 +5139,9 @@ set memory ignored.
 > tlpin,
 > sector,
 > hhid,
-> womname,
-> husbname,
-> sawkint,
+> /*womname,*/
+> /*husbname,*/
+> /*sawkint,*/
 > sadate,
 > workerid,
 > sastatus,
@@ -4573,7 +5149,6 @@ set memory ignored.
 > sadod,
 > sadaydrink,
 > sadawtwat,
-> sadawtwatc,
 > sadawata,
 > sadawatatc,
 > sadafdrink,
@@ -4618,6 +5193,7 @@ set memory ignored.
 > hhchange,
 > newhhid,
 > idenconf,
+> sadawtwatc,
 > /*insert_time,*/
 > /*update_time,*/
 > /*_submission_time,*/
@@ -4658,7 +5234,7 @@ file ..\datasets\stata\saf_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\saf_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:22
+ closed on:  22 Jan 2026, 10:56:38
 -------------------------------------------------------------------------------
 
 . 
@@ -4689,7 +5265,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\saf_wra.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:22
+ opened on:  22 Jan 2026, 10:56:38
 
 . odbc load,exec("
 > select 
@@ -4697,7 +5273,6 @@ set memory ignored.
 > tlpin,
 > sector,
 > hhid,
-> sawkint,
 > sadate,
 > workerid,
 > sastatus,
@@ -4705,7 +5280,6 @@ set memory ignored.
 > sadod,
 > sadaydrink,
 > sadawtwat,
-> sadawtwatc,
 > sadawata,
 > sadawatatc,
 > sadafdrink,
@@ -4739,12 +5313,14 @@ set memory ignored.
 > today,
 > start,
 > [end],
+> sadawtwatc,
 > sadf1,
 > sadfp1,
 > formorder,
 > _id,
 > _submission_time,
 > schedule_id,
+> sawkint,
 > duplicate
 > FROM [mindr-live].dbo.saf_wra_mv 
 > ") dsn("rammps");
@@ -4768,7 +5344,7 @@ file ..\datasets\stata\saf_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\saf_wra.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:23
+ closed on:  22 Jan 2026, 10:56:39
 -------------------------------------------------------------------------------
 
 . 
@@ -4799,7 +5375,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\serf_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:23
+ opened on:  22 Jan 2026, 10:56:39
 
 . odbc load,exec("
 > 
@@ -4944,7 +5520,7 @@ file ..\datasets\stata\serf_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\serf_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:23
+ closed on:  22 Jan 2026, 10:56:39
 -------------------------------------------------------------------------------
 
 . 
@@ -4971,7 +5547,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\ses_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:23
+ opened on:  22 Jan 2026, 10:56:39
 
 . odbc load,exec("
 > select
@@ -5113,7 +5689,7 @@ file ..\datasets\stata\ses_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\ses_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:23
+ closed on:  22 Jan 2026, 10:56:39
 -------------------------------------------------------------------------------
 
 . 
@@ -5140,7 +5716,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\ses_wra.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:23
+ opened on:  22 Jan 2026, 10:56:39
 
 . odbc load,exec("
 > select
@@ -5279,7 +5855,7 @@ file ..\datasets\stata\ses_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\ses_wra.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:23
+ closed on:  22 Jan 2026, 10:56:40
 -------------------------------------------------------------------------------
 
 . 
@@ -5310,7 +5886,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\sif.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:23
+ opened on:  22 Jan 2026, 10:56:40
 
 . odbc load,exec("
 > select
@@ -5372,26 +5948,15 @@ delimiter now cr
 . foreach v of varlist si* {
   2.      if !inlist("`v'", "sidate","sisaltstores") {
   3.             replace `v' = "" if (`v' == "n/a" )
-  4.         destring `v', force replace
-  5.      }
-  6. }
+  4.         //destring `v', force replace
+.      }
+  5. }
 (0 real changes made)
-sistatus: all characters numeric; replaced as byte
 (0 real changes made)
-sistmnt: contains nonnumeric characters; replaced as byte
-(354 missing values generated)
 (0 real changes made)
-sisalttype: all characters numeric; replaced as byte
-(7 missing values generated)
 (0 real changes made)
-sisaltstore: all characters numeric; replaced as byte
-(7 missing values generated)
 (0 real changes made)
-silid: all characters numeric; replaced as byte
-(7 missing values generated)
 (0 real changes made)
-siresult: all characters numeric; replaced as byte
-(7 missing values generated)
 
 . 
 . 
@@ -5408,7 +5973,7 @@ file ..\datasets\stata\sif_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\sif.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:23
+ closed on:  22 Jan 2026, 10:56:40
 -------------------------------------------------------------------------------
 
 . 
@@ -5439,7 +6004,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\sif.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:23
+ opened on:  22 Jan 2026, 10:56:40
 
 . odbc load,exec("
 > select
@@ -5502,26 +6067,15 @@ delimiter now cr
 . foreach v of varlist si* {
   2.      if !inlist("`v'", "sidate","sisaltstores") {
   3.             replace `v' = "" if (`v' == "n/a" )
-  4.         destring `v', force replace
-  5.      }
-  6. }
+  4.         //destring `v', force replace
+.      }
+  5. }
 (0 real changes made)
-sistatus: all characters numeric; replaced as byte
 (0 real changes made)
-sistmnt: contains nonnumeric characters; replaced as byte
-(286 missing values generated)
 (0 real changes made)
-sisalttype: all characters numeric; replaced as byte
-(6 missing values generated)
 (0 real changes made)
-sisaltstore: all characters numeric; replaced as byte
-(6 missing values generated)
 (0 real changes made)
-silid: all characters numeric; replaced as byte
-(6 missing values generated)
 (0 real changes made)
-siresult: all characters numeric; replaced as byte
-(6 missing values generated)
 
 . 
 . 
@@ -5538,7 +6092,138 @@ file ..\datasets\stata\sif_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\sif.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:23
+ closed on:  22 Jan 2026, 10:56:40
+-------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do generate_suf_pw.do
+
+.  cd "./"
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts
+
+. #delimit ;
+delimiter now ;
+. clear;
+
+. /*wef*/
+> set more off;
+
+. set memory 700m;
+set memory ignored.
+    Memory no longer needs to be set in modern Statas; memory adjustments are
+    performed on the fly automatically.
+
+. capture log close;
+
+. log using "..\datasets\logs\suf_pw.log", replace;
+-------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\suf_pw.log
+  log type:  text
+ opened on:  22 Jan 2026, 10:56:40
+
+. odbc load,exec("
+> select
+> uid,
+> tlpin,
+> sector,
+> hhid,
+> /*womname,*/
+> /*husbname,*/
+> sudate,
+> workerid,
+> sustatus,
+> suvisit,
+> sudod,
+> suucol,
+> sufrsturin,
+> suebcu,
+> sutimebcu,
+> suudt,
+> suucoltm,
+> sumidu,
+> suubkcb,
+> suupudt,
+> susampt,
+> suuspcid,
+> suussts,
+> workerid_urn,
+> suscol,
+> suins,
+> sucons,
+> suddef,
+> sutdef,
+> suddefc,
+> susbkcb,
+> sutdecc,
+> susspcid,
+> susssts,
+> workerid_stl,
+> version,
+> today,
+> start,
+> [end],
+> scheduleid,
+> formorder,
+> suucolres,
+> suscolres,
+> vt,
+> supt,
+> vts,
+> supts,
+> _date_modified,
+> _duration,
+> _id,
+> _media_all_received,
+> _media_count,
+> /*_notes,*/
+> _submission_time,
+> _submitted_by,
+> /*_tags,*/
+> _total_media,
+> _uuid,
+> _version,
+> _xform_id,
+> duplicate,
+> id,
+> insert_time,
+> inserted_by,
+> instance_id,
+> hhchange,
+> newhhid,
+> idenconf,
+> update_time,
+> updateed_by
+> FROM [mindr-live].dbo.suf_pw_mv
+> ") dsn("rammps");
+
+. fixdate sudate suudt suupudt suddef susbkcb;
+(1,166 real changes made)
+(1,132 real changes made)
+(1,132 real changes made)
+(596 real changes made)
+(596 real changes made)
+
+. #delimit cr
+delimiter now cr
+. 
+. 
+. save "..\datasets\stata\suf_pw.dta", replace
+file ..\datasets\stata\suf_pw.dta saved
+
+. saveold "..\datasets\stata\suf_pw.dta", replace version(12)
+(saving in Stata 12 format, which can be read by Stata 11 or 12)
+file ..\datasets\stata\suf_pw.dta saved
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
+> pts\..\datasets\logs\suf_pw.log
+  log type:  text
+ closed on:  22 Jan 2026, 10:56:40
 -------------------------------------------------------------------------------
 
 . 
@@ -5569,7 +6254,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\suf_wra.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:23
+ opened on:  22 Jan 2026, 10:56:40
 
 . odbc load,exec("
 > select
@@ -5577,13 +6262,9 @@ set memory ignored.
 > tlpin,
 > sector,
 > hhid,
-> hhchange,
-> newhhid,
 > /*womname,*/
 > /*husbname,*/
-> idenconf,
 > sudate,
-> suwkint,
 > workerid,
 > sustatus,
 > suvisit,
@@ -5599,9 +6280,6 @@ set memory ignored.
 > suupudt,
 > susampt,
 > suuspcid,
-> /*st,*/
-> vt,
-> supt,
 > suussts,
 > workerid_urn,
 > suscol,
@@ -5613,24 +6291,51 @@ set memory ignored.
 > susbkcb,
 > sutdecc,
 > susspcid,
-> /*st1,*/
-> vts,
-> supts,
 > susssts,
 > workerid_stl,
 > version,
 > today,
 > start,
 > [end],
-> formorder,
 > scheduleid,
-> case when suucolres ='null' then null else suucolres end as suucolres ,
-> duplicate 
+> formorder,
+> suucolres,
+> suscolres,
+> vt,
+> supt,
+> vts,
+> supts,
+> _date_modified,
+> _duration,
+> _id,
+> _media_all_received,
+> _media_count,
+> /*_notes,*/
+> _submission_time,
+> _submitted_by,
+> /*_tags,*/
+> _total_media,
+> _uuid,
+> _version,
+> _xform_id,
+> duplicate,
+> id,
+> insert_time,
+> instance_id,
+> hhchange,
+> newhhid,
+> idenconf,
+> update_time,
+> updateed_by
 > FROM [mindr-live].dbo.suf_wra_mv
 > ") dsn("rammps");
 
-. fixdate sudate;
-(826 real changes made)
+. fixdate sudate suudt suupudt suddef susbkcb;
+(796 real changes made)
+(780 real changes made)
+(780 real changes made)
+(527 real changes made)
+(527 real changes made)
 
 . #delimit cr
 delimiter now cr
@@ -5648,7 +6353,7 @@ file ..\datasets\stata\suf_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\suf_wra.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:23
+ closed on:  22 Jan 2026, 10:56:40
 -------------------------------------------------------------------------------
 
 . 
@@ -5676,7 +6381,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\urf.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:23
+ opened on:  22 Jan 2026, 10:56:40
 
 . odbc load,exec("
 > SELECT
@@ -5732,7 +6437,7 @@ file ..\datasets\stata\urf.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\urf.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:23
+ closed on:  22 Jan 2026, 10:56:40
 -------------------------------------------------------------------------------
 
 . 
@@ -5763,7 +6468,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\uvf.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:23
+ opened on:  22 Jan 2026, 10:56:40
 
 . odbc load,exec("
 > select
@@ -5905,7 +6610,7 @@ file ..\datasets\stata\uvf.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\uvf.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:24
+ closed on:  22 Jan 2026, 10:56:41
 -------------------------------------------------------------------------------
 
 . 
@@ -5933,7 +6638,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wef_nwef_all.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:24
+ opened on:  22 Jan 2026, 10:56:41
 
 . odbc load,exec("
 > SELECT
@@ -6053,7 +6758,7 @@ file ..\datasets\stata\wef_nwef_all.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wef_nwef_all.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:25
+ closed on:  22 Jan 2026, 10:56:43
 -------------------------------------------------------------------------------
 
 . 
@@ -6084,7 +6789,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wef.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:25
+ opened on:  22 Jan 2026, 10:56:43
 
 . odbc load,exec("
 > select
@@ -6181,7 +6886,7 @@ file ..\datasets\stata\wef.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wef.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:26
+ closed on:  22 Jan 2026, 10:56:43
 -------------------------------------------------------------------------------
 
 . 
@@ -6212,7 +6917,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wmf_pw.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:26
+ opened on:  22 Jan 2026, 10:56:43
 
 . odbc load,exec("
 > select 
@@ -6274,7 +6979,7 @@ file ..\datasets\stata\wmf_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wmf_pw.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:26
+ closed on:  22 Jan 2026, 10:56:44
 -------------------------------------------------------------------------------
 
 . 
@@ -6305,7 +7010,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wmf_wra.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:26
+ opened on:  22 Jan 2026, 10:56:44
 
 . odbc load,exec("
 > select 
@@ -6365,7 +7070,7 @@ file ..\datasets\stata\wmf_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wmf_wra.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:26
+ closed on:  22 Jan 2026, 10:56:44
 -------------------------------------------------------------------------------
 
 . 
@@ -6396,7 +7101,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\woman.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:26
+ opened on:  22 Jan 2026, 10:56:44
 
 . odbc load,exec("select
 > uid,
@@ -6593,7 +7298,7 @@ set memory ignored.
 (278 real changes made)
 (263 real changes made)
 (292 real changes made)
-(293 real changes made)
+(295 real changes made)
 (278 real changes made)
 (272 real changes made)
 (290 real changes made)
@@ -6651,7 +7356,7 @@ file ..\datasets\stata\woman_pw.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\woman.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:26
+ closed on:  22 Jan 2026, 10:56:44
 -------------------------------------------------------------------------------
 
 . 
@@ -6682,7 +7387,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\woman_wra.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:26
+ opened on:  22 Jan 2026, 10:56:44
 
 . odbc load,exec("select
 > uid,
@@ -6860,7 +7565,7 @@ file ..\datasets\stata\woman_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\woman_wra.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:26
+ closed on:  22 Jan 2026, 10:56:44
 -------------------------------------------------------------------------------
 
 . 
@@ -6891,7 +7596,7 @@ set memory ignored.
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\woman.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:26
+ opened on:  22 Jan 2026, 10:56:44
 
 . odbc load,exec("select
 > uid,
@@ -6955,7 +7660,7 @@ file ..\datasets\stata\woman.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\woman.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:26
+ closed on:  22 Jan 2026, 10:56:44
 -------------------------------------------------------------------------------
 
 . 
@@ -6983,7 +7688,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wra_1b_wra.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:26
+ opened on:  22 Jan 2026, 10:56:44
 
 . odbc load,exec("
 > SELECT
@@ -7130,7 +7835,7 @@ file ..\datasets\stata\wra_1b_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wra_1b_wra.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:27
+ closed on:  22 Jan 2026, 10:56:45
 -------------------------------------------------------------------------------
 
 . 
@@ -7158,7 +7863,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wra_3b_wra.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:27
+ opened on:  22 Jan 2026, 10:56:45
 
 . odbc load,exec("
 > SELECT
@@ -7310,7 +8015,7 @@ file ..\datasets\stata\wra_3b_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wra_3b_wra.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:27
+ closed on:  22 Jan 2026, 10:56:45
 -------------------------------------------------------------------------------
 
 . 
@@ -7338,7 +8043,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wra_eb_wra.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:27
+ opened on:  22 Jan 2026, 10:56:45
 
 . odbc load,exec("
 > SELECT
@@ -7493,7 +8198,7 @@ file ..\datasets\stata\wra_eb_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wra_eb_wra.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:27
+ closed on:  22 Jan 2026, 10:56:45
 -------------------------------------------------------------------------------
 
 . 
@@ -7521,7 +8226,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wratrak.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:27
+ opened on:  22 Jan 2026, 10:56:45
 
 . odbc load,exec("
 > SELECT
@@ -7606,7 +8311,7 @@ file ..\datasets\stata\wratrak.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wratrak.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:27
+ closed on:  22 Jan 2026, 10:56:46
 -------------------------------------------------------------------------------
 
 . 
@@ -7634,7 +8339,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wravf_e.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:27
+ opened on:  22 Jan 2026, 10:56:46
 
 . odbc load,exec("
 > SELECT
@@ -7661,7 +8366,7 @@ file ..\datasets\stata\wravf_e_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wravf_e.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:27
+ closed on:  22 Jan 2026, 10:56:46
 -------------------------------------------------------------------------------
 
 . 
@@ -7689,7 +8394,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wravf_f.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:27
+ opened on:  22 Jan 2026, 10:56:46
 
 . odbc load,exec("
 > SELECT
@@ -7716,7 +8421,7 @@ file ..\datasets\stata\wravf_f_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wravf_f.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:28
+ closed on:  22 Jan 2026, 10:56:46
 -------------------------------------------------------------------------------
 
 . 
@@ -7744,7 +8449,7 @@ delimiter now ;
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wravf_m_wra.log
   log type:  text
- opened on:  28 Oct 2025, 15:25:28
+ opened on:  22 Jan 2026, 10:56:46
 
 . odbc load,exec("
 > SELECT
@@ -7771,7 +8476,7 @@ file ..\datasets\stata\wravf_m_wra.dta saved
        log:  C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scri
 > pts\..\datasets\logs\wravf_m_wra.log
   log type:  text
- closed on:  28 Oct 2025, 15:25:28
+ closed on:  22 Jan 2026, 10:56:46
 -------------------------------------------------------------------------------
 
 . 
@@ -7799,6 +8504,10 @@ end of do-file
 . copy "`source_path'/drf_pw.dta" "`pw_path'" ,replace
 
 . copy "`source_path'/drf_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/dvf_pw.dta" "`pw_path'" ,replace
+
+. copy "`source_path'/dvf_wra.dta" "`wra_path'" ,replace
 
 . copy "`source_path'/fbaf.dta" "`pw_path'" ,replace
 
@@ -7841,6 +8550,8 @@ end of do-file
 
 . copy "`source_path'/pregtrak.dta" "`pw_path'" ,replace
 
+. copy "`source_path'/pregtrak_times.dta" "`pw_path'" ,replace
+
 . copy "`source_path'/px_pw.dta" "`pw_path'" ,replace
 
 . copy "`source_path'/px_wra.dta" "`wra_path'" ,replace
@@ -7859,6 +8570,8 @@ end of do-file
 . copy "`source_path'/sif_pw.dta" "`pw_path'" ,replace
 
 . copy "`source_path'/sif_wra.dta" "`wra_path'" ,replace
+
+. copy "`source_path'/suf_pw.dta" "`wra_path'" ,replace
 
 . copy "`source_path'/suf_wra.dta" "`wra_path'" ,replace
 

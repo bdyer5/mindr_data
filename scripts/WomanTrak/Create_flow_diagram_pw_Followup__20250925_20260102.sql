@@ -3588,3 +3588,11 @@ left join m69mopb_mv m6 on m6.uid = p.uid
 where m6.m6bstatus =1
 group by p.arm_pw
 with rollup 
+
+
+-- arm_pw	(No column name)
+-- W	49
+-- X	51
+-- Y	49
+-- Z	50
+-- NULL	199

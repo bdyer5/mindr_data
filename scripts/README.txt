@@ -57,3 +57,13 @@ SAF - 1 change made in the DB
 3. add mindr_ga from C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts\WomanTrak\ultrasound_ ga_data\20250603\mindr_ga_20250603.csv
 4. C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts\WomanTrak\LSI\indices_pw 
 5. C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts\WomanTrak\LSI\indices_wra
+
+need to run i69_mv 
+need to run i69s_mv 
+need to run i69s_mv 
+run Create_ianthro_20251111.sql
+run Create_kidtrak_20251111.sql
+run Create_flow_diagram_pw_Followup__20250925_20260102.sql
+
+20260122
+Created a backup of mindr-live for drf generation and saved it in backup on mindr_live_drf_20260122.bak

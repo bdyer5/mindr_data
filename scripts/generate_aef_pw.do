@@ -13,11 +13,8 @@ uid,
 tlpin,
 sector,
 hhid,
-hhchange,
-newhhid,
 womname,
 husbname,
-idenconf,
 aefdate,
 workerid,
 aeperson,
@@ -42,6 +39,9 @@ version,
 today,
 start,
 [end],
+hhchange,
+newhhid,
+idenconf,
 insert_time,
 update_time,
 _submission_time,
@@ -60,7 +60,10 @@ fixdate aefdate aeondate;
 
 //Calculate the number of splits needed
 local max_length_an = 242
-local num_splits_an = ceil(strlen(aedescpt) / `max_length_an')+1
+egen max_str_len = max(strlen(aedescpt))
+local num_splits_an = ceil(max_str_len[1]/ `max_length_an')
+
+drop max_str_len
 
 //Create new variables to hold the splits
 forval i = 1/`num_splits_an' {
@@ -73,7 +76,11 @@ drop aedescpt
 
 //Calculate the number of splits needed
 local max_length_an = 242
-local num_splits_an = ceil(strlen(aefevntsum) / `max_length_an')+1
+egen max_str_len = max(strlen(aefevntsum))
+local num_splits_an = ceil(max_str_len[1]/ `max_length_an')
+
+drop max_str_len
+
 
 //Create new variables to hold the splits
 forval i = 1/`num_splits_an' {

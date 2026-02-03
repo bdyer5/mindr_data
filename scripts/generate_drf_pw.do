@@ -82,8 +82,9 @@ replace drvstype = strtrim(drvstype)
 replace drvstype = lower(drvstype)
 gen drvstype_num = .
 replace drvstype_num = 1 if inlist(drvstype, "baseline_visit")
-replace drvstype_num = 2 if inlist(drvstype, "replicate_visit")
-replace drvstype_num = 3 if inlist(drvstype, "endline_visit")
+replace drvstype_num = 2 if inlist(drvstype, "midline_visit")
+replace drvstype_num = 3 if inlist(drvstype, "lpf_visit")
+replace drvstype_num = 4 if inlist(drvstype, "m1mop_visit")
 drop drvstype
 order drvstype_num, after(drstatus)
 rename drvstype_num drvstype
