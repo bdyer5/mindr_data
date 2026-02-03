@@ -7,3 +7,5 @@ scripts/WomanTrak/ultrasound_ga_data
 scripts/WomanTrak/serf/
 scripts/dietary_recall
 scripts/WomanTrak/discontinued_20241130.csv
+scripts/pullAndZip_20241019.bat
+scripts/pullAndZip.bat
