@@ -1,4 +1,3 @@
- cd "./"
 #delimit ;
 clear;
 /*drf*/
