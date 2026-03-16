@@ -324,9 +324,18 @@ from woman_pw
 update wtrak_pw_prep
 set woman_status = 8
 where uid in 
-('486871','815920') 
+('486871','815920','856034') 
 -- These 2 women are duplicate women. They were identified after the freeze of the data but reza has the count of women at 3999 
 -- and not 3991 as the flow diagram had indicated- reza said that this number was hard coded . 
+-- 856034 is newly identified as a duplicate. 
+
+-- insert uids 360686,673776,158483 into wtrak_pw_prep 
+-- these are the uids that are not in the woman_pw table that are in the mindr_wra table that 
+INSERT INTO wtrak_pw_prep (uid)
+VALUES
+(360686),
+(673776),
+(158483)
 
 
 select c.name from syscolumns c 
@@ -2758,7 +2767,7 @@ go
 
 
 print'Large N ' 
-select * from wtrak_pw 
+select * from wtrak_pw
 -- moved the exclusion of duplicate participants up to the wtrak_pw generation section
 
 print'Started Pregnancy Surveilance' 

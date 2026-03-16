@@ -67,3 +67,13 @@ run Create_flow_diagram_pw_Followup__20250925_20260102.sql
 
 20260122
 Created a backup of mindr-live for drf generation and saved it in backup on mindr_live_drf_20260122.bak
+
+
+-- 20260310 --
+Reconciling numbers for mindr enumeration. 
+Downloaded 4_mindr_live_Tuesday.7z  
+Added : 360686,673776,158483 to the wwtrak_pw_prep table before running the flow diagram. 
+They had a wef and became pregnant but did not become eligible for the study. 
+
+Also updated the kidtrak to drop 2 uids that were duplicate bnf sends. 
+

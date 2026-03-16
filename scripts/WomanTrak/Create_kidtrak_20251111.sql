@@ -91,6 +91,7 @@ into kidtrak
 from  [mindr-live].dbo.child c1
 join pregtrak w on w.uid=c1.w_uid
 where c1.w_uid in (select uid from [mindr-live].dbo.pregtrak where pef_consent='1')
+and child_status is null 
 --and c1.w_uid not in (select uid from wtrak where pdroutc ='4' )
 go
 
