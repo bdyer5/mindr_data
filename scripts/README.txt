@@ -77,3 +77,16 @@ They had a wef and became pregnant but did not become eligible for the study.
 
 Also updated the kidtrak to drop 2 uids that were duplicate bnf sends. 
 
+
+
+-- 20260324 -- 
+updating wratrak to add parity. 
+1. restored mindr_live_20250925_20251028.7z
+2. updated Create_flow_diagram_wra_20250925_20260324.sql
+3. ran Create_flow_diagram_wra_20250925_20260324.sql
+4. ran generate_wratrak.do
+5. crosscheced wratrak.dta with the one already posted in the Analytic_datasets folder on OneDrive
+6. uploaded it and archived the old version.
+    a. Note that LSI values were not present in the LSI variable in the originally posted wratrak.dta for some strange reason. 
+    Everything else matched. 
+    
