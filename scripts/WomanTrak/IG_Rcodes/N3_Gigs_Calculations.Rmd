@@ -1,0 +1,233 @@
+---
+title: "MiNDR_Gigs_Calculations"
+author: "Angela Kc - updated by Brian Dyer"
+date: "2026-04-03"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,    # Suppress warnings in output
+  message = FALSE     # Suppress messages in output
+)
+library(readr)
+library(dplyr)
+library(haven)
+library(tidyverse)
+# install.packages("pak")
+pak::pkg_install(pkg = "ropensci/gigs")
+library(gigs)
+setwd("C:/Users/bdyer/OneDrive - Johns Hopkins/CHN/JiVitA/MiNDR/data/scripts/womantrak/IG_Rcodes")
+```
+#### USING INTERGROWTH-21 ST EXTENSION TO GET SIZE FOR GESTATIONAL AGE - JN
+
+This code uses the INTERGROWTH-21st macro available at https://github.com/ropensci/gigs (for Stata codes see: https://github.com/lshtm-gigs) to calculate newborn size for gestational age. 
+
+The standard IG-21 contains the gestational age range from 24+0 to 42+6 weeks, but their extension macro allows for the extrapolation from 22+0 to 44+6 weeks. 
+
+These codes use the extension macro, allowing for a larger GA range. It contains the following IG-21st outputs:
+1. Birthweight:
+  1.1 Centile: birthweight_centile
+  1.2 Z-score: birthweight_zscore
+  1.3 SGA, LGA, and sfga_category (SGA, AGA, LGA)
+2. Birth length:
+  2.1 Centile: blen_centile
+  2.2 Z-score: blen_zscore
+2. Birth head circumference:
+  2.1 Centile: bhc_centile
+  2.2 Z-score: bhc_zscore
+
+Outlier SD values are also calculated for each z-score.
+
+## Reading in N3 newborn weight dataset.
+
+```{r n3 dataset read in}
+# n3bwt_data <- read_dta("/Users/angelakc/Library/CloudStorage/OneDrive-JohnsHopkins/Intergrowth 21_2026/Input Datasets/n3bwt.dta")
+n3bwt_data <- read_dta("./data/kidtrak.dta")
+```
+
+## Check how Gigs file works and the syntax.
+
+```{r combine, echo=TRUE}
+?gigs
+help(package = "gigs")
+```
+
+## Recode sex.
+
+```{r Recode, echo=TRUE}
+# Create sex_mf variable: 1 = "M" (male), 2 = "F" (female)
+n3bwt_data$sex_mf <- ifelse(n3bwt_data$sex_new == "Male", "M", "F")
+```
+
+
+## Obtain birthweight in kg.
+
+```{r Get kg BW, echo=TRUE}
+n3bwt_data$bwt <- n3bwt_data$bwt_comb/1000
+```
+
+## Classify size for GA.
+
+```{r Birthweight percentile for GA, echo=TRUE}
+# Create classified dataset
+n3bwt_classified <- n3bwt_data
+
+# Convert birth weight values to centiles using IG-NBS extension
+n3bwt_classified$birthweight_centile <- value2centile(
+  y = n3bwt_classified$bwt,           # weight in kg
+  x = n3bwt_classified$ga,            # gestational age in days
+  sex = n3bwt_classified$sex_mf,      # sex as "M"/"F"
+  family = "ig_nbs_ext",              # IG-NBS extension standards
+  acronym = "wfga"                    # weight-for-gestational-age
+) |>
+  round(digits = 3)
+
+
+# Create individual binary indicators (SGA, LGA and AGA)
+n3bwt_classified <- n3bwt_classified %>%
+  mutate(
+    sga = as.numeric(birthweight_centile < 0.10),
+    lga = as.numeric(birthweight_centile > 0.90),
+    aga = as.numeric(between(birthweight_centile, 0.10, 0.90))
+  )
+
+# Create a categorical variable 
+n3bwt_classified$sfga_category <- case_when(
+  is.na(n3bwt_classified$birthweight_centile) ~ NA_character_,
+  n3bwt_classified$birthweight_centile < 0.10 ~ "SGA",
+  n3bwt_classified$birthweight_centile > 0.90 ~ "LGA",
+  TRUE ~ "AGA"
+)
+
+# Add labels
+n3bwt_classified$sfga_category <- factor(n3bwt_classified$sfga_category, 
+                                          levels = c("SGA", "AGA", "LGA"))
+```
+## Calculate Z-scores birthweight
+
+```{r Birthweight for gestational age z-score, echo=TRUE}
+# Define z-score cutoffs (including 0)
+z_cutoffs <- c(-6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6)
+
+# Create labels for the categories
+z_labels <- c("< -6 SD", "-6 to -5 SD", "-5 to -4 SD", "-4 to -3 SD", 
+              "-3 to -2 SD", "-2 to -1 SD", "-1 to 0 SD", "0 to +1 SD", 
+              "+1 to +2 SD", "+2 to +3 SD", "+3 to +4 SD", "+4 to +5 SD", 
+              "+5 to +6 SD", "> +6 SD")
+
+# Function to categorize z-scores
+categorize_zscore <- function(zscore) {
+  cut(zscore, 
+      breaks = c(-Inf, z_cutoffs, Inf),
+      labels = z_labels,
+      include.lowest = TRUE)
+}
+
+# Convert birth weight values to z-scores using IG-NBS extension
+n3bwt_classified$birthweight_zscore <- value2zscore(
+  y = n3bwt_classified$bwt,           # weight in kg
+  x = n3bwt_classified$ga,            # gestational age in days
+  sex = n3bwt_classified$sex_mf,      # sex as "M"/"F"
+  family = "ig_nbs_ext",              # IG-NBS extension standards
+  acronym = "wfga"                    # weight-for-gestational-age
+) |>
+  round(digits = 3)
+
+# Create birthweight categories
+n3bwt_classified$birthweight_category <- categorize_zscore(n3bwt_classified$birthweight_zscore)
+
+# Create zscore_outlier variable for +/- 5 SD as numeric
+n3bwt_classified$zscore_5sd_outlier <- as.numeric(
+  n3bwt_classified$birthweight_zscore < -5 | n3bwt_classified$birthweight_zscore > 5
+)
+
+```
+
+## Birth length classification - by GIGS
+
+```{r GIGS for birth length, echo=TRUE}
+
+# Convert birth length values to centiles using IG-NBS extension
+n3bwt_classified$blen_centile <- value2centile(
+  y = n3bwt_classified$blth,          # length in cm
+  x = n3bwt_classified$ga,            # gestational age in days
+  sex = n3bwt_classified$sex_mf,      # sex as "M"/"F"
+  family = "ig_nbs_ext",              # IG-NBS extension standards
+  acronym = "lfga"                    # length-for-gestational-age
+) |>
+  round(digits = 3)
+
+# Convert birth length values to z-scores using IG-NBS extension
+n3bwt_classified$blen_zscore <- value2zscore(
+  y = n3bwt_classified$blth,          # length in cm
+  x = n3bwt_classified$ga,            # gestational age in days
+  sex = n3bwt_classified$sex_mf,      # sex as "M"/"F"
+  family = "ig_nbs_ext",              # IG-NBS extension standards
+  acronym = "lfga"                    # length-for-gestational-age
+) |>
+  round(digits = 3)
+
+# Create birth length categories
+n3bwt_classified$blen_category <- categorize_zscore(n3bwt_classified$blen_zscore)
+
+# Create zscore_outlier variable for +/- 5 SD as numeric
+n3bwt_classified$blen_zscore_5sd_outlier <- as.numeric(
+  n3bwt_classified$blen_zscore < -5 | n3bwt_classified$blen_zscore > 5
+)
+
+# Create zscore_6sd_outlier variable for +/- 6 SD as numeric
+n3bwt_classified$blen_zscore_6sd_outlier <- as.numeric(
+  n3bwt_classified$blen_zscore < -6 | n3bwt_classified$blen_zscore > 6
+)
+
+```
+## Birth head circumference classification - by GIGS
+
+```{r GIGS for birth head circumference, echo=TRUE}
+
+# Convert head circumference values to centiles using IG-NBS extension
+n3bwt_classified$hc_centile <- value2centile(
+  y = n3bwt_classified$bhc,           # head circumference in cm
+  x = n3bwt_classified$ga,            # gestational age in days
+  sex = n3bwt_classified$sex_mf,      # sex as "M"/"F"
+  family = "ig_nbs_ext",              # IG-NBS extension standards
+  acronym = "hcfga"                   # head circumference-for-gestational-age
+) |>
+  round(digits = 3)
+
+# Convert head circumference values to z-scores using IG-NBS extension
+n3bwt_classified$hc_zscore <- value2zscore(
+  y = n3bwt_classified$bhc,           # head circumference in cm
+  x = n3bwt_classified$ga,            # gestational age in days
+  sex = n3bwt_classified$sex_mf,      # sex as "M"/"F"
+  family = "ig_nbs_ext",              # IG-NBS extension standards
+  acronym = "hcfga"                   # head circumference-for-gestational-age
+) |>
+  round(digits = 3)
+
+# Create head circumference categories
+n3bwt_classified$hc_category <- categorize_zscore(n3bwt_classified$hc_zscore)
+
+# Create zscore_outlier variable for +/- 5 SD as numeric
+n3bwt_classified$hc_zscore_5sd_outlier <- as.numeric(
+  n3bwt_classified$hc_zscore < -5 | n3bwt_classified$hc_zscore > 5
+)
+
+# Create zscore_6sd_outlier variable for +/- 6 SD as numeric
+n3bwt_classified$hc_zscore_6sd_outlier <- as.numeric(
+  n3bwt_classified$hc_zscore < -6 | n3bwt_classified$hc_zscore > 6
+)
+
+```
+
+```{r Export in Stata format, echo=TRUE}
+# Export the dataset as a Stata .dta file
+write_dta(n3bwt_classified, "/Users/angelakc/Library/CloudStorage/OneDrive-JohnsHopkins/Intergrowth 21_2026/Output Datasets/n3bwt_gigs.dta")
+
+```

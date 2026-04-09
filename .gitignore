@@ -9,3 +9,11 @@ scripts/dietary_recall
 scripts/WomanTrak/discontinued_20241130.csv
 scripts/pullAndZip_20241019.bat
 scripts/pullAndZip.bat
+scripts/WomanTrak/IG_Rcodes/data/kidtrak.dta
+scripts/WomanTrak/IG_Rcodes/output/
+scripts/WomanTrak/IG_Rcodes/test/*.dta
+scripts/WomanTrak/IG_Rcodes/test/*.csv
+scripts/WomanTrak/lee_birthweight/*.csv
+scripts/WomanTrak/lee_birthweight/*.dta
+scripts/WomanTrak/IG_Rcodes/*.dta
+scripts/WomanTrak/IG_Rcodes/*.csv

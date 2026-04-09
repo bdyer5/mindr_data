@@ -79,6 +79,18 @@ go
 alter table ianthro_prep
 alter column fb_muac decimal (10,1)
 go 
+alter table ianthro_prep
+alter column ib_hc decimal (10,1)
+go 
+alter table ianthro_prep
+alter column fb_hc decimal (10,1)
+go 
+alter table ianthro_prep
+alter column ib_cc decimal (10,1)
+go 
+alter table ianthro_prep
+alter column fb_cc decimal (10,1)
+go 
 go 
 alter table ianthro_prep
 alter column wt_birth decimal (10,3)

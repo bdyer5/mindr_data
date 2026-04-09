@@ -11,6 +11,7 @@ do generate_dvf_wra.do
 do generate_fbaf.do
 do generate_i1mop.do
 do generate_ibaf.do
+do generate_kidtrak.do
 do generate_lab_proc_pw.do
 do generate_lab_proc_wra.do
 do generate_lab_proc.do

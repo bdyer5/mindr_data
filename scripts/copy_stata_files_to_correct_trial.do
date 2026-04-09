@@ -13,6 +13,7 @@ copy "`source_path'/dvf_wra.dta" "`wra_path'" ,replace
 copy "`source_path'/fbaf.dta" "`pw_path'" ,replace
 copy "`source_path'/i1mop.dta" "`pw_path'" ,replace
 copy "`source_path'/ibaf.dta" "`pw_path'" ,replace
+copy "`source_path'/kidtrak.dta" "`pw_path'" ,replace
 copy "`source_path'/lab_proc_pw.dta" "`pw_path'" ,replace
 copy "`source_path'/lab_proc_wra.dta" "`wra_path'" ,replace
 copy "`source_path'/lab_recv_pw.dta" "`pw_path'" ,replace

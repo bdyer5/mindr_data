@@ -38,9 +38,10 @@ drfoodwr,
 drmixveg,
 drfoodscan,
 drfoodcons,
+drfoodconss,
 drtabn
-from [mindr-live].dbo.pw_drf d
-left join [mindr-live].dbo.woman_pw p on p.uid = d.uid
+from [mindr_live_drf].dbo.pw_drf d
+left join [mindr_live_drf].dbo.woman_pw p on p.uid = d.uid
 ") dsn("rammps");
 
 fixdate wmdate drydate;
@@ -50,7 +51,7 @@ fixdate wmdate drydate;
 
 
 foreach v of varlist dr* {
-     if !inlist("`v'", "drdate","drydate","drtabn","drvstype","dryday","drunkfoods","drmixveg") {
+     if !inlist("`v'", "drdate","drydate","drtabn","drvstype","dryday","drunkfoods","drmixveg","drfoodconss") {
 	    replace `v' = "" if (`v' == "n/a" )
         destring `v', force replace
      }

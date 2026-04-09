@@ -18,6 +18,7 @@ null as bnf_date,
 --c1.gender as sexcd,
 null as sexcd,
 null as sexsrc, 
+null as bgga_dy,
 null as bgga,
 null as preterm,
 NUll as sectorid,
@@ -618,6 +619,8 @@ where ((i.ibweight is not null and i.ibweight !='0.000' and i.ibweight !='9.999'
 ) o
 go
 
+-- check that ibaf weight or fbaf weight is not null 
+
 
 alter table kidtrak 
 alter column anthro_date datetime
@@ -1046,11 +1049,21 @@ alter table kidtrak
 alter column bgga decimal (10,1)
 go 
 
+alter table kidtrak
+alter column bgga_dy decimal
+go 
+
 print '21 Update bgga from wtrak '
 update kidtrak
 set bgga=w.bgga 
 from kidtrak k
 left join pregtrak w on w.uid = k.momuid 
+
+print '21 Update bgga_dy from wtrak '
+update kidtrak
+set bgga_dy =w.bgga_dy 
+from kidtrak k
+left join wtrak_pw w on w.uid = k.momuid 
 
 
 print '22 Update bgga from wtrak '
@@ -1483,7 +1496,46 @@ set agem6_2 = aged6_2 / cast(30.0 as decimal(10,1))
 from kidtrak k 
 go 
 
+alter table kidtrak
+add wazig_birth varchar(10)
+go
 
+alter table kidtrak
+add lazig_birth varchar(10)
+go
+
+alter table kidtrak
+add hczig_birth varchar(10)
+go
+
+alter table kidtrak
+add wlzig_birth varchar(10)
+go
+
+alter table kidtrak
+add wapig_birth varchar(10)
+go
+
+alter table kidtrak
+add lapig_birth varchar(10)
+go
+
+alter table kidtrak
+add hcpig_birth varchar(10)
+go
+
+
+update kidtrak 
+set wazig_birth = case when mg.wazig_birth = '' then null else mg.wazig_birth end,
+lazig_birth = case when mg.lazig_birth = '' then null else mg.lazig_birth end,
+hczig_birth = case when mg.hczig_birth = '' then null else mg.hczig_birth end,
+wlzig_birth = case when mg.wlzig_birth = '' then null else mg.wlzig_birth end,
+wapig_birth = case when mg.wapig_birth = '' then null else mg.wapig_birth end,
+lapig_birth = case when mg.lapig_birth = '' then null else mg.lapig_birth end,
+hcpig_birth = case when mg.hcpig_birth = '' then null else mg.hcpig_birth end
+from kidtrak k 
+left join mindr_gigs_20260406 mg on mg.childuid = k.childuid
+where mg.childuid is not null 
 
 
 
@@ -1595,10 +1647,11 @@ k.momuid as uid,
 w.tlpin as tlpin, 
 w.sector as sector,
 w.hhid,
-k.arm,
-k.pe_consent,
+k.pe_consent as pef_consent,
+k.arm as arm_pw,
 --k.hhid,
 sexcd as sex,
+k.bgga_dy as bggady,
 k.bgga as bggawk,
 /*k.bnf_date,*/
 /*sexsrc,*/
@@ -1617,46 +1670,59 @@ todsrc,
 deadaged,
 bgdodru as dodru,
 --dob_dt,
-wt_birth,
-len_birth,
-muac_birth,
-hc_birth,
-cc_birth,
-aged_ibaf_2 as aged_ibaf,
-aged_fbaf_2 as aged_fbaf,
-aged_birth_2 as aged_birth,
-i1date_2 as i1date,
-i1status,
-wt1,
-len1,
-muac1,
-hc1,
-cc1,
-aged1_2 as aged1,
-agem1_2 as agem1,
-i3date_2 as i3date,
-i3status,
-wt3,
-len3,
-muac3,
-hc3,
-cc3,
-aged3_2 as aged3,
-agem3_2 as agem3,
-i6date_2 as i6date,
-i6status,
-wt6,
-len6,
-muac6,
-hc6,
-cc6,
-aged6_2 as aged6,
-agem6_2 as agem6,
 censrvital,
 /*censrwk,*/
 /*censrru,*/
 censrdate,
 censraged,
+aged_ibaf_2 as aged_ibaf,
+aged_fbaf_2 as aged_fbaf,
+aged_birth_2 as aged_birth,
+wt_birth,
+len_birth,
+muac_birth,
+hc_birth,
+cc_birth,
+wazig_birth,
+lazig_birth,
+hczig_birth,
+wlzig_birth,
+wapig_birth,
+lapig_birth,
+hcpig_birth,
+null as sga3_ig,
+null as sga10_ig,
+i1date_2 as i1date,
+i1status,
+aged1_2 as aged1,
+agem1_2 as agem1,
+wt1,
+len1,
+muac1,
+hc1,
+cc1,
+null as waz1,
+null as laz1,
+null as wlz1,
+null as hcz1,
+i3date_2 as i3date,
+i3status,
+aged3_2 as aged3,
+agem3_2 as agem3,
+wt3,
+len3,
+muac3,
+hc3,
+cc3,
+i6date_2 as i6date,
+i6status,
+aged6_2 as aged6,
+agem6_2 as agem6,
+wt6,
+len6,
+muac6,
+hc6,
+cc6,
 /*preterm,*/
 /*CDOBDay,*/
 /*CDOBMonth,*/

@@ -89,4 +89,51 @@ updating wratrak to add parity.
 6. uploaded it and archived the old version.
     a. Note that LSI values were not present in the LSI variable in the originally posted wratrak.dta for some strange reason. 
     Everything else matched. 
+7. backed up to mindr_live_20250925_20260324.bak and stored it on OneDrive here:
+https://livejohnshopkins.sharepoint.com/:f:/r/sites/JiVitAShare/Shared%20Documents/MiNDR/database?csf=1&web=1&e=RR8TId
+
     
+--20260401 -- 
+Creating Kidtrak 
+using backup from today(20260401) 5_mindr_live_wednesday.bak 
+run Create_flow_diagram_wra_20250925_20250102.sql 
+run Create_ianthro_20251111
+run Create_kidtrak_20251111
+create generate_kidtrak
+
+-- 20260406 -- 
+I created a csv here:
+C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts\WomanTrak\IG_Rcodes\output\mindr_gigs_1.csv
+- going to import this into SQL and write this for Ethan. 
+- ran run_generatescripts.do 
+and also had to run Create saf_wra 
+and also had to run Create saf_pw
+
+-- 20260406 1609 -- 
+-restoring to the  mindr_live_20250925_20260324.bak file 
+- run Create flow _pw 
+- run create kidtrak 
+- run Create i69_mop_mv 
+- run Create m36mopb_mv
+- run Create m69mop_mv
+- run Create m69mopb_mv
+- run Create ibaf_mv 
+- run Create fbaf_mv 
+- run Create_ianthro_20251111.sql
+- add dtime function from TargetBEP db 
+- run create_dvf_pw_mv.sql
+- run create_dvf_wra_mv.sql
+- run create_suf_pw_mv.sql
+- run kidtrak
+- compare kidtrak with todays version. there was an anthropometry date that changed also tob 
+- posted the kidtrak to the 202509 PW folder. 
+- I did check the mindr_gigs to see if anything might have changed due to the anthro date change but after re-running everything matches. 
+
+
+-- 20260408 -- 
+- imported backup 6_mindr_live.7z from 20260409 335 AM 
+- recreated drf datasets for Eleonor and team added variable drfoodconss after Asif ran code today. 
+- copied the bacup to C:\Users\bdyer\OneDrive - Johns Hopkins\JiVitA Share - Documents\MiNDR\database\mindr_live_drf_20260408.7z
+
+
+
