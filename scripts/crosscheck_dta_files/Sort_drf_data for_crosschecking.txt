@@ -1,0 +1,28 @@
+
+use "C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\datasets\stata_20250626_20260421\stata\PW_study\drf_pw.dta", clear
+sort uid wmdate drvstype drfoodw drfoodti drfoodt drfoodgrp drfoodscan drfoodcons drtabn dritemcode
+order uid wmdate drvstype drfoodw drfoodti drfoodt drfoodgrp drfoodscan drfoodcons drtabn dritemcode
+save "C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\datasets\stata_20250626_20260421\stata\PW_study\drf_pw_2.dta", replace
+clear
+use "C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\datasets\stata\drf_pw.dta"
+sort uid wmdate drvstype drfoodw drfoodti drfoodt drfoodgrp drfoodscan drfoodcons drtabn dritemcode
+order uid wmdate drvstype drfoodw drfoodti drfoodt drfoodgrp drfoodscan drfoodcons drtabn dritemcode
+save "C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\datasets\stata\drf_pw_2.dta", replace
+clear
+use "C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\datasets\stata_20250626_20260421\stata\PW_study\drf_pw_2.dta", clear
+cf _all using "C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\datasets\stata\drf_pw_2.dta" ,verbose
+clear
+
+use "C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\datasets\stata_20250626_20260421\stata\PW_study\drf_pw.dta", clear
+sort uid wmdate drvstype drfoodw drfoodti drfoodt drfoodgrp drfoodscan drfoodcons drtabn dritemcode
+order uid wmdate drvstype drfoodw drfoodti drfoodt drfoodgrp drfoodscan drfoodcons drtabn dritemcode
+save "C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\datasets\stata_20250626_20260421\stata\PW_study\drf_pw_2.dta", replace
+clear
+use "C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\datasets\stata\drf_pw.dta"
+sort uid wmdate drvstype drfoodw drfoodti drfoodt drfoodgrp drfoodscan drfoodcons drtabn dritemcode
+order uid wmdate drvstype drfoodw drfoodti drfoodt drfoodgrp drfoodscan drfoodcons drtabn dritemcode
+save "C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\datasets\stata\drf_pw_2.dta", replace
+clear
+use "C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\datasets\stata_20250626_20260421\stata\PW_study\drf_pw_2.dta", clear
+cf _all using "C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\datasets\stata\drf_pw_2.dta" ,verbose
+clear

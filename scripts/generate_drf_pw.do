@@ -39,7 +39,8 @@ drmixveg,
 drfoodscan,
 drfoodcons,
 drfoodconss,
-drtabn
+drtabn,
+drtabgrp
 from [mindr_live_drf].dbo.pw_drf d
 left join [mindr_live_drf].dbo.woman_pw p on p.uid = d.uid
 ") dsn("rammps");

@@ -21,7 +21,6 @@ d.hhid,
 convert(smalldatetime,drdate,121) as wmdate,
 workerid,
 drstatus,
-
 drvstype,
 drsick,
 drappt,
@@ -41,7 +40,8 @@ drmixveg,
 drfoodscan,
 drfoodcons,
 drfoodconss,
-drtabn
+drtabn,
+drtabgrp
 from [mindr_live_drf].dbo.wra_drf d
 left join [mindr_live_drf].dbo.woman_wra p on p.uid = d.uid
 ") dsn("rammps");

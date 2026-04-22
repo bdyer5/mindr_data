@@ -136,4 +136,10 @@ and also had to run Create saf_pw
 - copied the bacup to C:\Users\bdyer\OneDrive - Johns Hopkins\JiVitA Share - Documents\MiNDR\database\mindr_live_drf_20260408.7z
 
 
+-- 20260422 -- 
+- imported backup 5_mindr_live_wednesday.7z from 20260422 335 AM as mindr_live_drf database. - done
+- recreated drf datasets. - done
+- copied the bacup to C:\Users\bdyer\OneDrive - Johns Hopkins\JiVitA Share - Documents\MiNDR\database\mindr_live_drf_20260422.7z - done
+
+
 
