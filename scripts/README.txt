@@ -143,3 +143,39 @@ and also had to run Create saf_pw
 
 
 
+-- 20260504 -- 
+-- Need to update the WRA consort to flag 206541 as a baseline discontinuation instead of a Midline discontinuation
+-- using mindr_live_20250925_20260324.bak
+- import mindr_live_20250925_20260324 to mindr-live db
+- ran Create_flow_diagram_wra_20250925_20260504.sql
+- created restore mindr_live_20250925_20260504
+
+
+-- 20260508 
+-- updating DRF -- 
+- imported backup 4_mindr_live_Tuesday.7z from 20260504 335 AM as mindr_live_drf database. - done
+- run C:\Users\bdyer\OneDrive - Johns Hopkins\CHN\JiVitA\MiNDR\data\scripts\sql\drf_flag_dup_20260508.sql -- flags a duplicate -- done 
+- recreated drf dataset for drf_pw that now have the codes that eleonor expected. - done
+- crosschecked - done 
+- copied the bacup to C:\Users\bdyer\OneDrive - Johns Hopkins\JiVitA Share - Documents\MiNDR\database\mindr_live_drf_20260508.7z - done
+
+
+--20260514 -- 
+updated 912613 discnt to missing from "ml" in the wtrak_wra 
+and saved the database to backup and updated the wratrak 
+
+--20260522-- 
+exporting serf_wra and eser 
+-- imported mindr_live_20250925_20260504 to mindr-live database 
+- ran: 
+serf_wra_mv_14d.sql
+serf_wra_mv_hv_v2.sql
+serf_wra_mv_v2.sql
+serf_wra_mv_combined.sql
+
+then ran these do files to export the data to stata: 
+generate_eser_wra.do
+generate_serf_wra.do
+
+created a backup of the database and posted it to the Sharepoint here: 
+C:\Users\bdyer\OneDrive - Johns Hopkins\JiVitA Share - Documents\MiNDR\database\mindr_live_20250925_20260522.7z

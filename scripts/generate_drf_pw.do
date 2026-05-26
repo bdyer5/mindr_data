@@ -3,6 +3,14 @@ clear;
 /*drf*/
 set more off;
 /*set memory 700m;   removed 2024.05.14  */
+/* run  
+drf_flag_dup_20260508
+alter table PW_DRF
+
+add [duplicate] [varchar](1) NULL
+update PW_DRF set duplicate='1' where uid='957145' and drtabn is not null and dritemcode='N/A' and id='1225' and htime='2' and drvstype='LPF_visit'
+
+  */
 
 capture log close;
 log using "..\datasets\logs\drf.log", replace;
@@ -43,6 +51,7 @@ drtabn,
 drtabgrp
 from [mindr_live_drf].dbo.pw_drf d
 left join [mindr_live_drf].dbo.woman_pw p on p.uid = d.uid
+where d.duplicate is null 
 ") dsn("rammps");
 
 fixdate wmdate drydate;
