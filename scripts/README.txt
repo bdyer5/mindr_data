@@ -179,3 +179,10 @@ generate_serf_wra.do
 
 created a backup of the database and posted it to the Sharepoint here: 
 C:\Users\bdyer\OneDrive - Johns Hopkins\JiVitA Share - Documents\MiNDR\database\mindr_live_20250925_20260522.7z
+
+--20260522-- 
+updated Create_flow_diagram_wra_20250925_20260903.sql 
+- updated consort. 
+- No modified changes to the data. 
+- Just added queries to identify the baseline biospecimens 
+collected 
